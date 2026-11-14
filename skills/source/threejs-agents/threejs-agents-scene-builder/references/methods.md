@@ -8,7 +8,7 @@
 |-----------|--------------|
 | Key light | `DirectionalLight`, intensity 1-3, position `(5, 10, 7.5)` |
 | Fill light | `HemisphereLight`, sky `#87CEEB`, ground `#362907`, intensity 0.5-0.8 |
-| Shadow type | `PCFSoftShadowMap` |
+| Shadow type | `PCFShadowMap` |
 | Shadow map | 2048x2048, bias `-0.0001`, normalBias `0.02` |
 | Shadow frustum | MUST size manually to scene bounds |
 | Environment | HDR sky or Drei `<Sky>` with sun position matching DirectionalLight |
@@ -19,7 +19,7 @@
 |-----------|--------------|
 | Key lights | 1-3 `PointLight` or `SpotLight` per room, intensity 100-300 candela |
 | Fill light | `AmbientLight`, intensity 0.1-0.3 |
-| Shadow type | `PCFSoftShadowMap` or `VSMShadowMap` |
+| Shadow type | `PCFShadowMap` or `VSMShadowMap` |
 | Shadow casters | Limit to 2-3 lights maximum |
 | Environment | Low-intensity HDR for subtle reflections |
 | Special | `RectAreaLight` for window light (REQUIRES `RectAreaLightUniformsLib.init()`) |
@@ -182,7 +182,7 @@
 ### HDR Loading Pattern (Imperative)
 
 ```
-1. Load HDR with RGBELoader or EXRLoader
+1. Load HDR with HDRLoader or EXRLoader
 2. Create PMREMGenerator from renderer
 3. Call pmremGenerator.fromEquirectangular(hdrTexture)
 4. Assign result.texture to scene.environment

@@ -9,10 +9,10 @@ description: >
   Keywords: lighting, AmbientLight, DirectionalLight, PointLight, SpotLight, RectAreaLight, HemisphereLight, environment map, HDR, IBL, scene too dark, add light, realistic lighting.
   PMREMGenerator, scene.environment.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-lighting
@@ -21,7 +21,7 @@ metadata:
 
 ### Light Types at a Glance
 
-| Light | Shadows | Direction | Cost | Intensity Unit (r160+) |
+| Light | Shadows | Direction | Cost | Intensity Unit (r187) |
 |-------|---------|-----------|------|----------------------|
 | `AmbientLight` | NO | None (uniform) | Negligible | Unitless multiplier |
 | `HemisphereLight` | NO | Vertical gradient | Negligible | Unitless multiplier |
@@ -71,9 +71,9 @@ The `Light` base class provides:
 
 ---
 
-## Physically Correct Lighting (r160+)
+## Physically Correct Lighting (r187)
 
-As of r160+, ALL lighting uses physically based units by default. The legacy `renderer.useLegacyLights` property was removed.
+As of r187, ALL lighting uses physically based units by default. The legacy `renderer.useLegacyLights` property was removed.
 
 | Light Type | Intensity Unit | Description |
 |-----------|---------------|-------------|
@@ -194,27 +194,26 @@ scene.add(probe);
 
 ## Environment Maps (IBL)
 
-Image-Based Lighting (IBL) provides the most realistic ambient illumination for PBR materials. The standard workflow uses `RGBELoader` + `PMREMGenerator`.
+Image-Based Lighting (IBL) provides the most realistic ambient illumination for PBR materials. For an HDR panorama, assign a texture with EquirectangularReflectionMapping;
+the renderer prefilters it automatically. Explicit PMREMGenerator is useful for
+scene capture or controlled preprocessing.
 
 ### Standard HDR Environment Workflow
 
 ```javascript
 import * as THREE from 'three';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
-const pmremGenerator = new THREE.PMREMGenerator(renderer);
-const rgbeLoader = new RGBELoader();
-
-rgbeLoader.load('environment.hdr', (hdrTexture) => {
-  const envMap = pmremGenerator.fromEquirectangular(hdrTexture);
-
-  scene.environment = envMap.texture;  // ALL PBR materials auto-use this
-  scene.background = envMap.texture;   // Optional: visible HDR background
-
-  hdrTexture.dispose();                // Free source texture
-  pmremGenerator.dispose();            // ALWAYS dispose after use
-});
+const hdrTexture = await new HDRLoader().loadAsync('environment.hdr');
+hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+scene.environment = hdrTexture;
+scene.background = hdrTexture;
+// Keep the texture alive while the scene uses it; dispose it on teardown.
 ```
+
+In r187, generated PMREMs are cube render targets, not cube-UV atlases. ALWAYS
+use the renderer-compatible generator and retain the output target until teardown.
+PBR reflections can look different from r186 because the filtering changed.
 
 ### scene.environment vs scene.background
 

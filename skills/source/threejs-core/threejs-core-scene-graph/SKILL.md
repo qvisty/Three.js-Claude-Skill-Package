@@ -8,10 +8,10 @@ description: >
   Group, Mesh, Layers, Fog, traversal, coordinate conversion.
   Keywords: scene graph, Object3D, add, remove, traverse, layers, fog, parent, children, visibility, Three.js scene setup, group objects, show hide object, organize scene.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-core-scene-graph

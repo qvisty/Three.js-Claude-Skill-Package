@@ -5,7 +5,7 @@
 **WRONG:**
 ```bash
 # Compress with Draco first
-npx gltf-transform draco model.glb draco-model.glb
+npx --yes @gltf-transform/cli@4.5.1 draco model.glb draco-model.glb
 
 # Then try to add meshopt on top
 gltfpack -i draco-model.glb -o final.glb -cc
@@ -16,7 +16,7 @@ gltfpack -i draco-model.glb -o final.glb -cc
 **CORRECT:**
 ```bash
 # Choose ONE compression format
-npx gltf-transform draco model.glb output.glb
+npx --yes @gltf-transform/cli@4.5.1 draco model.glb output.glb
 # OR
 gltfpack -i model.glb -o output.glb -cc
 ```
@@ -28,7 +28,7 @@ gltfpack -i model.glb -o output.glb -cc
 **WRONG:**
 ```bash
 # Just blindly apply everything
-npx gltf-transform optimize model.glb output.glb --compress draco --texture-compress ktx2
+npx --yes @gltf-transform/cli@4.5.1 optimize model.glb output.glb --compress draco --texture-compress ktx2
 # "It's smaller, ship it!"
 ```
 
@@ -37,7 +37,7 @@ npx gltf-transform optimize model.glb output.glb --compress draco --texture-comp
 **CORRECT:**
 ```bash
 # ALWAYS assess first
-npx gltf-transform inspect model.glb
+npx --yes @gltf-transform/cli@4.5.1 inspect model.glb
 # Read the output, then decide which optimizations to apply
 ```
 
@@ -47,8 +47,7 @@ npx gltf-transform inspect model.glb
 
 **WRONG:**
 ```bash
-npx gltf-transform ktx2 model.glb output.glb \
-  --filter "normalTexture=etc1s"
+npx --yes @gltf-transform/cli@4.5.1 etc1s model.glb output.glb \
 ```
 
 **WHY:** ETC1S is a lossy format optimized for perceptual color quality. Normal maps contain mathematical direction data, not perceptual color. ETC1S compression introduces block artifacts that cause visible lighting errors: faceted shading, banding on smooth surfaces, and sparkle artifacts.
@@ -56,9 +55,7 @@ npx gltf-transform ktx2 model.glb output.glb \
 **CORRECT:**
 ```bash
 # ALWAYS use UASTC for normal maps
-npx gltf-transform ktx2 model.glb output.glb \
-  --filter "normalTexture=uastc" \
-  --filter "baseColorTexture=etc1s"
+npx --yes @gltf-transform/cli@4.5.1 uastc model.glb output.glb \
 ```
 
 ---
@@ -68,7 +65,7 @@ npx gltf-transform ktx2 model.glb output.glb \
 **WRONG:**
 ```bash
 # Model has animated doors and windows
-npx gltf-transform join building.glb joined.glb
+npx --yes @gltf-transform/cli@4.5.1 join building.glb joined.glb
 # Now doors and windows are merged into walls -- animations break
 ```
 
@@ -77,10 +74,10 @@ npx gltf-transform join building.glb joined.glb
 **CORRECT:**
 ```bash
 # Flatten and dedup, but skip join for animated models
-npx gltf-transform dedup building.glb step1.glb
-npx gltf-transform flatten step1.glb step2.glb
+npx --yes @gltf-transform/cli@4.5.1 dedup building.glb step1.glb
+npx --yes @gltf-transform/cli@4.5.1 flatten step1.glb step2.glb
 # Do NOT join if parts are independently animated
-npx gltf-transform weld step2.glb output.glb
+npx --yes @gltf-transform/cli@4.5.1 weld step2.glb output.glb
 ```
 
 ---
@@ -103,7 +100,7 @@ Blender Export Settings:
   Compression: ✗ None  <-- keep this off
 
 # Then compress with gltf-transform
-npx gltf-transform draco exported.glb final.glb
+npx --yes @gltf-transform/cli@4.5.1 draco exported.glb final.glb
 ```
 
 ---
@@ -113,7 +110,7 @@ npx gltf-transform draco exported.glb final.glb
 **WRONG:**
 ```bash
 # Simplify to 5% -- maximum compression!
-npx gltf-transform simplify character.glb output.glb \
+npx --yes @gltf-transform/cli@4.5.1 simplify character.glb output.glb \
   --ratio 0.05 --error 0.02
 # Ship without looking at it
 ```
@@ -123,7 +120,7 @@ npx gltf-transform simplify character.glb output.glb \
 **CORRECT:**
 ```bash
 # Simplify conservatively
-npx gltf-transform simplify character.glb output.glb \
+npx --yes @gltf-transform/cli@4.5.1 simplify character.glb output.glb \
   --ratio 0.5 --error 0.001
 
 # ALWAYS load the result in a Three.js viewer and compare side-by-side
@@ -206,8 +203,7 @@ dracoLoader.dispose();
 
 **WRONG:**
 ```bash
-npx gltf-transform ktx2 model.glb output.glb \
-  --filter "baseColorTexture=uastc"
+npx --yes @gltf-transform/cli@4.5.1 etc1s model.glb output.glb \
 # Deploy to mobile web
 ```
 
@@ -216,8 +212,7 @@ npx gltf-transform ktx2 model.glb output.glb \
 **CORRECT:**
 ```bash
 # Use ETC1S for color maps on mobile -- 10-20x smaller VRAM footprint
-npx gltf-transform ktx2 model.glb output.glb \
-  --filter "baseColorTexture=etc1s" \
+npx --yes @gltf-transform/cli@4.5.1 etc1s model.glb output.glb \
   --quality 128
 ```
 
@@ -228,7 +223,7 @@ npx gltf-transform ktx2 model.glb output.glb \
 **WRONG:**
 ```bash
 # Optimize in-place, overwriting the original
-npx gltf-transform optimize model.glb model.glb --compress draco
+npx --yes @gltf-transform/cli@4.5.1 optimize model.glb model.glb --compress draco
 # Original is gone forever
 ```
 
@@ -237,7 +232,7 @@ npx gltf-transform optimize model.glb model.glb --compress draco
 **CORRECT:**
 ```bash
 # ALWAYS write to a new file
-npx gltf-transform optimize model.glb model-optimized.glb --compress draco
+npx --yes @gltf-transform/cli@4.5.1 optimize model.glb model-optimized.glb --compress draco
 
 # Keep originals in version control or asset storage
 # Use a naming convention: model.glb (original), model-web.glb (optimized)
@@ -250,8 +245,8 @@ npx gltf-transform optimize model.glb model-optimized.glb --compress draco
 **WRONG:**
 ```bash
 # Compress BEFORE simplifying
-npx gltf-transform draco model.glb step1.glb
-npx gltf-transform simplify step1.glb step2.glb --ratio 0.5
+npx --yes @gltf-transform/cli@4.5.1 draco model.glb step1.glb
+npx --yes @gltf-transform/cli@4.5.1 simplify step1.glb step2.glb --ratio 0.5
 # Draco decompression + re-compression introduces double quantization errors
 ```
 
@@ -262,7 +257,7 @@ npx gltf-transform simplify step1.glb step2.glb --ratio 0.5
 # ALWAYS follow this order:
 # 1. dedup → 2. flatten → 3. join → 4. weld → 5. simplify
 # → 6. texture optimize → 7. compress (Draco) → 8. prune → 9. quantize
-npx gltf-transform dedup model.glb step1.glb
-npx gltf-transform simplify step1.glb step2.glb --ratio 0.5
-npx gltf-transform draco step2.glb output.glb
+npx --yes @gltf-transform/cli@4.5.1 dedup model.glb step1.glb
+npx --yes @gltf-transform/cli@4.5.1 simplify step1.glb step2.glb --ratio 0.5
+npx --yes @gltf-transform/cli@4.5.1 draco step2.glb output.glb
 ```

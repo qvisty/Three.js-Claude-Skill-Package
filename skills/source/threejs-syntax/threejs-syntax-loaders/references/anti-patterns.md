@@ -31,25 +31,23 @@ function animate() {
 
 ---
 
-## Anti-Pattern 2: Missing DRACOLoader Decoder Path
+## Anti-Pattern 2: Missing DRACOLoader Registration
 
-**WRONG:**
-```javascript
-const dracoLoader = new DRACOLoader();
-// Forgot to call setDecoderPath()
-gltfLoader.setDRACOLoader(dracoLoader);
-const gltf = await gltfLoader.loadAsync('compressed.glb');
-// Runtime error: decoder WASM not found
-```
+**WRONG:** Load a Draco-compressed GLB with a bare GLTFLoader.
 
-**WHY:** Draco decompression requires WASM files (`draco_decoder.wasm`, `draco_wasm_wrapper.js`). Without the correct path, loading silently fails or throws a cryptic error.
+**WHY:** The GLTFLoader requires an explicitly registered DRACOLoader. In r187,
+the Draco loader itself has a working default path to bundled WASM assets.
 
 **CORRECT:**
 ```javascript
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 gltfLoader.setDRACOLoader(dracoLoader);
+const gltf = await gltfLoader.loadAsync('compressed.glb');
+// Dispose the loader only after all jobs using it have completed.
 ```
+
+For offline or custom hosting, serve the decoder assets from the same Three.js
+release and override the path deliberately. NEVER copy a decoder URL from an older release.
 
 ---
 

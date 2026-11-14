@@ -1,6 +1,6 @@
 # threejs-impl-lighting — Methods Reference
 
-> Complete API signatures for all light types, helpers, and PMREMGenerator in Three.js r160+.
+> Complete API signatures for all light types, helpers, and PMREMGenerator in Three.js r187.
 
 ---
 
@@ -53,7 +53,7 @@ class HemisphereLight extends Light {
 class DirectionalLight extends Light {
   constructor(
     color?: ColorRepresentation,  // Default: 0xffffff
-    intensity?: number            // Default: 1 (lux in r160+)
+    intensity?: number            // Default: 1 (lux in r187)
   );
   shadow: DirectionalLightShadow;
   target: Object3D;               // MUST add to scene for repositioning
@@ -71,7 +71,7 @@ class DirectionalLight extends Light {
 class PointLight extends Light {
   constructor(
     color?: ColorRepresentation,  // Default: 0xffffff
-    intensity?: number,           // Default: 1 (candela in r160+)
+    intensity?: number,           // Default: 1 (candela in r187)
     distance?: number,            // Default: 0 (infinite, inverse-square)
     decay?: number                // Default: 2 (physically correct)
   );
@@ -95,7 +95,7 @@ class PointLight extends Light {
 class SpotLight extends Light {
   constructor(
     color?: ColorRepresentation,  // Default: 0xffffff
-    intensity?: number,           // Default: 1 (candela in r160+)
+    intensity?: number,           // Default: 1 (candela in r187)
     distance?: number,            // Default: 0 (infinite)
     angle?: number,               // Default: Math.PI / 3, max Math.PI / 2
     penumbra?: number,            // Default: 0 (sharp edge), range [0, 1]
@@ -121,7 +121,7 @@ class SpotLight extends Light {
 class RectAreaLight extends Light {
   constructor(
     color?: ColorRepresentation,  // Default: 0xffffff
-    intensity?: number,           // Default: 1 (nits = cd/m2 in r160+)
+    intensity?: number,           // Default: 1 (nits = cd/m2 in r187)
     width?: number,               // Default: 10
     height?: number               // Default: 10
   );
@@ -184,21 +184,22 @@ class PMREMGenerator {
 
   fromEquirectangular(
     equirectangular: Texture,
-    renderTarget?: WebGLRenderTarget
-  ): WebGLRenderTarget;
-  // Returns render target with .texture for scene.environment
+    renderTarget?: WebGLCubeRenderTarget | null
+  ): WebGLCubeRenderTarget;
+  // r187 returns a cube render target; its texture uses cubemap mip levels.
 
   fromScene(
     scene: Scene,
     sigma?: number,               // Blur sigma, default 0
     near?: number,                // Default 0.1
-    far?: number                  // Default 100
-  ): WebGLRenderTarget;
+    far?: number,                 // Default 100
+    options?: { size?: number; position?: Vector3 }
+  ): WebGLCubeRenderTarget;
 
   fromCubemap(
     cubemap: CubeTexture,
-    renderTarget?: WebGLRenderTarget
-  ): WebGLRenderTarget;
+    renderTarget?: WebGLCubeRenderTarget | null
+  ): WebGLCubeRenderTarget;
 
   compileCubemapShader(): void;   // Pre-compile for faster first use
   compileEquirectangularShader(): void;
@@ -314,11 +315,11 @@ class Scene extends Object3D {
 
 ---
 
-## RGBELoader (addon)
+## HDRLoader (addon)
 
 ```typescript
-// Import: 'three/addons/loaders/RGBELoader.js'
-class RGBELoader extends DataTextureLoader {
+// Import: 'three/addons/loaders/HDRLoader.js'
+class HDRLoader extends DataTextureLoader {
   load(
     url: string,
     onLoad?: (texture: DataTexture) => void,
@@ -345,3 +346,12 @@ class EXRLoader extends DataTextureLoader {
   setDataType(type: number): this;
 }
 ```
+
+## r187 PMREM Representation
+
+PMREM output is a cubemap with roughness-dependent mip levels. The removed
+CubeUVReflectionMapping export and old 2D cube-UV atlas layout MUST NOT be used.
+The signature block above describes WebGLRenderer's PMREMGenerator from three.
+For WebGPURenderer import PMREMGenerator from three/webgpu and await renderer.init().
+Retain the returned cube target until its environment texture is no longer used;
+generator.dispose() does not replace disposing the output target on teardown.

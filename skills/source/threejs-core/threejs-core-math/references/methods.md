@@ -1,4 +1,4 @@
-# API Signatures Reference (Three.js r160+ Math)
+# API Signatures Reference (Three.js r187 Math)
 
 ## Vector3
 

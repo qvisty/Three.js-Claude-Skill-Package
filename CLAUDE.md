@@ -108,7 +108,7 @@ On FIRST session in a new workspace, ensure permissions are configured for auton
 ### P-005: Skill Standards
 - English-only (Claude reads English, responds in any language)
 - Deterministic: use ALWAYS/NEVER language
-- Version-explicit: specify Three.js r160+, React Three Fiber 8.x versions
+- Version-explicit: specify Three.js r187 (`three@0.187.0`), React Three Fiber 9.8.2 / React 19 versions
 - Self-contained: each skill works independently
 - Max 500 lines per SKILL.md
 
@@ -149,8 +149,8 @@ Before ending any session:
 
 | Technology | Prefix | Versions |
 |------------|--------|----------|
-| Three.js | threejs- | r160+ (ES modules, MIT license) |
-| React Three Fiber | threejs- | 8.x (R3F, React renderer for Three.js) |
+| Three.js | threejs- | r187 (`three@0.187.0`) (ES modules, MIT license) |
+| React Three Fiber | threejs- | 9.8.2 / React 19 (R3F, React renderer for Three.js) |
 | Drei | threejs- | Latest (helpers/abstractions for R3F) |
 | WebGPU Renderer | threejs- | Three.js WebGPU (TSL node-based materials) |
 
@@ -220,7 +220,7 @@ description: >
   Covers [key topics, API areas, version differences].
   Keywords: [comma-separated technical terms].
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+ / React Three Fiber 8.x."
+compatibility: "Designed for Claude Code. Requires Three.js r187 (`three@0.187.0`) / React Three Fiber 9.8.2 / React 19."
 metadata:
   author: OpenAEC-Foundation
   version: "1.0"

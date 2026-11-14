@@ -197,7 +197,7 @@ new OutlinePass(
 ```ts
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 
-new SMAAPass( width: number, height: number )
+new SMAAPass()
 ```
 
 Subpixel morphological anti-aliasing. Moderate quality and cost.
@@ -283,7 +283,7 @@ new LUTPass( params: { lut: DataTexture, intensity?: number } )
 
 ```ts
 import { MaskPass } from 'three/addons/postprocessing/MaskPass.js';
-import { ClearMaskPass } from 'three/addons/postprocessing/ClearMaskPass.js';
+import { ClearMaskPass } from 'three/addons/postprocessing/MaskPass.js';
 
 new MaskPass( scene: Scene, camera: Camera )
 new ClearMaskPass()
@@ -375,12 +375,12 @@ Presets: `SMAAPreset.LOW`, `SMAAPreset.MEDIUM`, `SMAAPreset.HIGH`, `SMAAPreset.U
 
 ---
 
-## WebGPU PostProcessing
+## WebGPU RenderPipeline
 
 ```ts
-import { PostProcessing } from 'three/addons/tsl/display/PostProcessing.js';
+import { RenderPipeline } from 'three/webgpu';
 
-new PostProcessing( renderer: WebGPURenderer )
+new RenderPipeline( renderer: WebGPURenderer )
 ```
 
 Uses TSL (Three Shading Language) node graphs. Entirely separate API from WebGL post-processing.

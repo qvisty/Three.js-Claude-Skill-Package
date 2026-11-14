@@ -8,10 +8,10 @@ description: >
   useLoader, JSX mapping, event system, performance patterns.
   Keywords: React Three Fiber, R3F, Canvas, useFrame, useThree, useLoader, @react-three/fiber, 3D React, declarative Three.js, use Three.js with React, JSX 3D components.
 license: MIT
-compatibility: "Designed for Claude Code. Requires @react-three/fiber 8.x+, React 18+."
+compatibility: "Designed for Claude Code. Requires @react-three/fiber 9.8.2, React 19. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-react-three-fiber
@@ -169,7 +169,7 @@ Register custom Three.js classes as JSX elements:
 
 ```jsx
 import { extend } from '@react-three/fiber'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 extend({ OrbitControls })
 // Now usable as <orbitControls args={[camera, domElement]} />
@@ -252,6 +252,39 @@ const geometry = useMemo(() => new THREE.TorusKnotGeometry(1, 0.3, 128, 32), [])
 Without `useMemo`, a new object is created on every render.
 
 ---
+
+## r187 Renderer and React 19 Boundary
+
+ALWAYS pair Fiber 9 with React 19 and Drei 10.7. Use `shadows="percentage"`
+to select PCF shadows without the deprecated PCFSoft warning. R3F still owns a
+Clock internally; ALWAYS use the delta supplied by useFrame and read elapsedTime
+without advancing that clock yourself.
+
+For WebGPURenderer, preserve the canvas supplied by Fiber and await init:
+
+```jsx
+import { Canvas, extend } from '@react-three/fiber'
+import * as THREE from 'three/webgpu'
+
+extend(THREE)
+
+function WebGPUCanvas({ children }) {
+  return (
+    <Canvas gl={async (props) => {
+      const renderer = new THREE.WebGPURenderer(props)
+      await renderer.init()
+      return renderer
+    }}>
+      {children}
+    </Canvas>
+  )
+}
+```
+
+ALWAYS augment Fiber's `ThreeElements` for custom TypeScript elements with React
+19; NEVER depend on the former global JSX namespace. Verify each Drei helper
+against the chosen renderer: WebGL-based effects and environment capture helpers
+are not automatically compatible with WebGPURenderer.
 
 ## Reference Links
 

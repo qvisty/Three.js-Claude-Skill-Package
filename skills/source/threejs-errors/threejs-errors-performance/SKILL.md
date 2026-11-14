@@ -9,10 +9,10 @@ description: >
   renderer.info, Stats.js profiling.
   Keywords: performance, memory leak, dispose, draw calls, FPS, slow, optimization, InstancedMesh, LOD, renderer.info, Stats, profiling, laggy, low FPS, stuttering, browser freezes.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-errors-performance
@@ -193,11 +193,20 @@ scene.add(mesh);
 | < 10 | Individual `Mesh` objects are fine |
 | 10-100 | Either approach; profile your case |
 | 100-10,000 | ALWAYS use `InstancedMesh` |
-| > 10,000 | `InstancedMesh` with spatial subdivision or `BatchedMesh` (r160+) |
+| > 10,000 | `InstancedMesh` with spatial subdivision or `BatchedMesh` (r187) |
 
-### BatchedMesh (r160+): Multiple Geometries in One Call
+### BatchedMesh (r187): Multiple Geometries in One Call
 
-`BatchedMesh` extends instancing to support different geometries and materials in a single draw call. Use for heterogeneous repeated objects.
+`BatchedMesh` batches different geometries with a shared material. ALWAYS add an
+instance after adding geometry; `addGeometry()` alone draws nothing in r187.
+
+```javascript
+const batch = new THREE.BatchedMesh(10, 240, 360, sharedMaterial);
+const geometryId = batch.addGeometry(new THREE.BoxGeometry());
+const instanceId = batch.addInstance(geometryId);
+batch.setMatrixAt(instanceId, new THREE.Matrix4().makeTranslation(2, 0, 0));
+scene.add(batch);
+```
 
 ### Geometry Merging: Static Objects
 
@@ -261,7 +270,6 @@ lod.update(camera);
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
 const ktx2Loader = new KTX2Loader()
-  .setTranscoderPath('three/addons/libs/basis/')
   .detectSupport(renderer);
 
 ktx2Loader.load('texture.ktx2', (texture) => {

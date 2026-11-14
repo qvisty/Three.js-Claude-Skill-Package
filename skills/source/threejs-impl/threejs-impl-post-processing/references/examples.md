@@ -1,7 +1,7 @@
 # examples.md -- threejs-impl-post-processing
 
 > Working code examples for common Three.js post-processing setups.
-> All examples use ES module imports and Three.js r160+.
+> All examples use ES module imports and Three.js r187.
 
 ---
 

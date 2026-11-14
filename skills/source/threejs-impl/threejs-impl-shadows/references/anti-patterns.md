@@ -194,7 +194,7 @@ leafMesh.customDepthMaterial = new THREE.MeshDepthMaterial({
 
 ```js
 // BAD -- switching type after initial render
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 // ... render a few frames ...
 renderer.shadowMap.type = THREE.VSMShadowMap;
 // Result: corrupted shadow maps, visual glitches

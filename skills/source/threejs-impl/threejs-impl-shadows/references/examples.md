@@ -17,7 +17,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 // Step 1: Enable shadows on the renderer
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 // Step 2: Create and configure light with shadows
 const dirLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -85,7 +85,7 @@ import * as THREE from 'three';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const scene = new THREE.Scene();
 
@@ -137,7 +137,7 @@ import * as THREE from 'three';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const scene = new THREE.Scene();
 
@@ -235,7 +235,7 @@ import * as THREE from 'three';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 // Disable automatic shadow updates
 renderer.shadowMap.autoUpdate = false;
@@ -292,4 +292,4 @@ dirLight.shadow.blurSamples = 16;  // more = smoother blur
 scene.add(dirLight);
 ```
 
-**Warning**: VSM can produce light bleeding artifacts. If shadows leak through thin geometry, switch to `PCFSoftShadowMap`.
+**Warning**: VSM can produce light bleeding artifacts. If shadows leak through thin geometry, switch to `PCFShadowMap`.

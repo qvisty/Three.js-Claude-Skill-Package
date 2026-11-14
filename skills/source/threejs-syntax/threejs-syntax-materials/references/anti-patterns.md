@@ -157,26 +157,21 @@ material.needsUpdate = true;  // Set ONCE after the change
 
 ---
 
-## 8. Forgetting uv2 for aoMap and lightMap
+## 8. Assuming AO Requires a Duplicated uv2 Attribute
 
-```javascript
-// WRONG: Using aoMap without uv2 attribute -- AO will not render
-const material = new THREE.MeshStandardMaterial({
-  aoMap: aoTexture,
-  aoMapIntensity: 1.0
-});
-const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
-// aoMap is silently ignored because geometry has no uv2 attribute
+In r187, textures select their UV attribute through `texture.channel`:
+0 = `uv`, 1 = `uv1`, 2 = `uv2`, 3 = `uv3`. AO and light maps default to channel 0.
+NEVER duplicate UV attributes merely to enable AO.
 
-// CORRECT: ALWAYS add uv2 attribute when using aoMap or lightMap
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-geometry.setAttribute('uv2', geometry.getAttribute('uv'));
-const mesh = new THREE.Mesh(geometry, material);
+```js
+const material = new THREE.MeshStandardMaterial({ aoMap: aoTexture });
+// aoTexture.channel defaults to 0: uses geometry.attributes.uv.
+// For a separately baked unwrap, load geometry with uv1, then:
+aoTexture.channel = 1;
+material.needsUpdate = true;
 ```
 
-**WHY**: `aoMap` and `lightMap` sample from the second UV channel (`uv2`). If the geometry does not have a `uv2` attribute, the maps are silently ignored with no error or warning. For simple cases, copying `uv` to `uv2` works. For baked lighting, use a dedicated UV unwrap for `uv2`.
-
----
+ALWAYS match texture.channel to an attribute actually present on the geometry.
 
 ## 9. flipY = true on Render Target Textures
 

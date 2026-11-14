@@ -64,8 +64,8 @@ new THREE.RawShaderMaterial(parameters?: {
 | `lights` | `boolean` | `false` | If `true`, passes light data as uniforms |
 | `fog` | `boolean` | `false` | If `true`, passes fog data as uniforms |
 | `clipping` | `boolean` | `false` | If `true`, enables clipping planes |
-| `glslVersion` | `string \| null` | `null` | `null` = GLSL1, `THREE.GLSL3` = GLSL 3.0 ES |
-| `defaultAttributeValues` | `Object` | `{ color: [1,1,1], uv: [0,0], uv2: [0,0] }` | Fallback values for missing geometry attributes |
+| `glslVersion` | `string \| null` | `null` | ShaderMaterial uses GLSL ES 3; GLSL3 disables the gl_FragColor alias. RawShaderMaterial needs explicit GLSL3 for ES 3 syntax. |
+| `defaultAttributeValues` | `Object` | `{ color: [1,1,1], uv: [0,0], uv1: [0,0] }` | Fallback values for missing geometry attributes |
 | `isShaderMaterial` | `boolean` | `true` | Read-only type flag |
 
 ---
@@ -120,8 +120,7 @@ new THREE.RawShaderMaterial(parameters?: {
 | `position` | `vec3` | `geometry.attributes.position` |
 | `normal` | `vec3` | `geometry.attributes.normal` |
 | `uv` | `vec2` | `geometry.attributes.uv` |
-| `uv2` | `vec2` | `geometry.attributes.uv2` |
-| `tangent` | `vec4` | `geometry.attributes.tangent` (if present) |
+| `uv1` / `uv2` / `uv3` / `tangent` | attribute-specific | Explicitly declare these in custom shaders when needed |
 | `color` | `vec3` | `geometry.attributes.color` (if present) |
 
 ---

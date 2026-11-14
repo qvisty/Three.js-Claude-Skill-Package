@@ -152,7 +152,7 @@ scene.add(sun);
 // Scene is completely blown out to white
 ```
 
-**Why it fails:** In r160+, intensity values represent real physical units. A DirectionalLight at 50,000 lux produces values far above the displayable [0,1] range. Without tone mapping, these values clamp to white.
+**Why it fails:** In r187, intensity values represent real physical units. A DirectionalLight at 50,000 lux produces values far above the displayable [0,1] range. Without tone mapping, these values clamp to white.
 
 **Correct:**
 ```javascript
@@ -173,7 +173,7 @@ ALWAYS set `renderer.toneMapping` when using physically correct intensity values
 **Wrong:**
 ```javascript
 const pmrem = new THREE.PMREMGenerator(renderer);
-new RGBELoader().load('env.hdr', (texture) => {
+new HDRLoader().load('env.hdr', (texture) => {
   const envMap = pmrem.fromEquirectangular(texture);
   scene.environment = envMap.texture;
   texture.dispose();
@@ -186,7 +186,7 @@ new RGBELoader().load('env.hdr', (texture) => {
 **Correct:**
 ```javascript
 const pmrem = new THREE.PMREMGenerator(renderer);
-new RGBELoader().load('env.hdr', (texture) => {
+new HDRLoader().load('env.hdr', (texture) => {
   const envMap = pmrem.fromEquirectangular(texture);
   scene.environment = envMap.texture;
   texture.dispose();

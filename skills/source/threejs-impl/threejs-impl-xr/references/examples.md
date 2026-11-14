@@ -207,13 +207,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
 renderer.xr.setReferenceSpaceType('local-floor');
 
-// Request hand-tracking feature
-renderer.xr.setSessionInit({
-  optionalFeatures: ['hand-tracking']
-});
+// Request hand tracking when creating the VR session button.
+const sessionInit = { optionalFeatures: ['hand-tracking'] };
 
 document.body.appendChild(renderer.domElement);
-document.body.appendChild(VRButton.createButton(renderer));
+document.body.appendChild(VRButton.createButton(renderer, sessionInit));
 
 scene.add(new THREE.HemisphereLight(0x808080, 0x606060));
 
@@ -273,7 +271,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
 renderer.xr.setReferenceSpaceType('local-floor');
 document.body.appendChild(renderer.domElement);
-document.body.appendChild(VRButton.createButton(renderer));
+document.body.appendChild(VRButton.createButton(renderer, sessionInit));
 
 // Floor
 const floor = new THREE.Mesh(

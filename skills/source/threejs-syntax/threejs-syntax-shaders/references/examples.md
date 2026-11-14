@@ -36,9 +36,11 @@ const material = new THREE.ShaderMaterial({
 const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
 
 // Animation loop
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
-  material.uniforms.uTime.value = clock.getElapsedTime();
+  timer.update();
+  material.uniforms.uTime.value = timer.getElapsed();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
@@ -138,10 +140,12 @@ material.onBeforeCompile = (shader) => {
 material.customProgramCacheKey = () => 'wavy-standard';
 
 // Animation loop
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
+  timer.update();
   if (material.userData.shader) {
-    material.userData.shader.uniforms.uTime.value = clock.getElapsedTime();
+    material.userData.shader.uniforms.uTime.value = timer.getElapsed();
   }
   renderer.render(scene, camera);
   requestAnimationFrame(animate);

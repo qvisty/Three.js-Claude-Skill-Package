@@ -9,10 +9,10 @@ description: >
   across controls, environment, text, materials, loaders, performance.
   Keywords: Drei, @react-three/drei, OrbitControls, Environment, useGLTF, useTexture, Html, Text, Stage, ContactShadows, Instances, helper components, ready-made, quick setup React 3D.
 license: MIT
-compatibility: "Designed for Claude Code. Requires @react-three/drei, @react-three/fiber 8.x+."
+compatibility: "Designed for Claude Code. Targets @react-three/drei 10.7.9, @react-three/fiber 9.8.2, React 19 and Three.js r187."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-drei

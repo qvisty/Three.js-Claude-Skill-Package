@@ -4,6 +4,26 @@ All notable changes to the Three.js Skill Package will be documented in this fil
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Changed
+- Target Three.js r187 (0.187.0), with React 19, Fiber 9.8.2 and Drei 10.7.9 retained.
+- Review all 24 skills against r187 exports and the official migration guide.
+- Document cubemap PMREM output, render-target viewport/scissor units, runtime
+  primitives, TSL coercion/storage/light registration and the XR camera contract.
+- Replace the deprecated iridescence thickness range with minimum/maximum fields.
+- Correct a pre-existing XR session configuration API error found during review.
+- Preserve r186 repairs to HDR loading, timing, PCF shadows, UV channels, imports,
+  RenderPipeline, batching and glTF Transform recipes.
+
+### Added
+- Locked development dependencies and repeatable import/API/browser validation.
+- r187 regression tests for target coordinates at DPR 2, PMREM generation and PBR
+  rendering, iridescence serialization and numeric pixelation size.
+- Browser case selection, real rotation assertions, resize-frame synchronization,
+  and rendered-frame PNG/JSON artifacts; fixes blank image capture after resize.
+- Separate historical r186 and current r187 migration/validation reports.
+
 ## [1.0.0] - 2026-03-20
 
 ### Added

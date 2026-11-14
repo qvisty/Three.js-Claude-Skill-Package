@@ -1,4 +1,4 @@
-# Material Types & API Reference (Three.js r160+)
+# Material Types & API Reference (Three.js r187)
 
 ## Base Material
 
@@ -66,9 +66,9 @@ new MeshBasicMaterial({
   envMap: Texture | null;           // Environment map
   fog: boolean;                     // Default: true
   alphaMap: Texture | null;         // Alpha transparency map
-  aoMap: Texture | null;            // Ambient occlusion map (requires uv2)
+  aoMap: Texture | null;            // Ambient occlusion map (uses texture.channel; default uv)
   aoMapIntensity: number;           // Default: 1.0
-  lightMap: Texture | null;         // Baked light map (requires uv2)
+  lightMap: Texture | null;         // Baked light map (uses texture.channel; default uv)
   lightMapIntensity: number;        // Default: 1.0
 });
 ```
@@ -152,7 +152,7 @@ new MeshStandardMaterial({
   displacementMap: Texture | null;  // Vertex displacement
   displacementScale: number;        // Default: 1.0
   displacementBias: number;         // Default: 0.0
-  aoMap: Texture | null;            // Ambient occlusion (R channel, requires uv2)
+  aoMap: Texture | null;            // Ambient occlusion (R channel, uses texture.channel; default uv)
   aoMapIntensity: number;           // Default: 1.0
   emissive: Color | number;         // Default: 0x000000
   emissiveMap: Texture | null;
@@ -160,7 +160,7 @@ new MeshStandardMaterial({
   envMap: Texture | null;           // Environment reflection
   envMapIntensity: number;          // Default: 1.0
   alphaMap: Texture | null;         // Per-pixel transparency (R channel)
-  lightMap: Texture | null;         // Baked lighting (requires uv2)
+  lightMap: Texture | null;         // Baked lighting (uses texture.channel; default uv)
   lightMapIntensity: number;        // Default: 1.0
   flatShading: boolean;             // Default: false
   wireframe: boolean;               // Default: false
@@ -206,7 +206,8 @@ new MeshPhysicalMaterial({
   // Iridescence (thin-film)
   iridescence: number;                  // 0-1. Default: 0.0
   iridescenceIOR: number;               // Default: 1.3
-  iridescenceThicknessRange: [number, number]; // Default: [100, 400] nm
+  iridescenceThicknessMinimum: number; // Default: 100 nm
+  iridescenceThicknessMaximum: number; // Default: 400 nm
   iridescenceMap: Texture | null;
   iridescenceThicknessMap: Texture | null;
 
@@ -352,7 +353,7 @@ class Texture {
   // Properties
   image: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
   mapping: number;              // UVMapping (default)
-  channel: number;              // UV channel (0 = uv, 1 = uv2)
+  channel: number;              // UV channel (0 = uv, 1 = uv1, 2 = uv2, 3 = uv3)
   wrapS: number;                // ClampToEdgeWrapping (default)
   wrapT: number;                // ClampToEdgeWrapping (default)
   magFilter: number;            // LinearFilter (default)

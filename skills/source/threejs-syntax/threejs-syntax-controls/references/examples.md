@@ -110,11 +110,13 @@ document.addEventListener('keyup', (event) => {
   }
 });
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 
 function animate() {
+  timer.update();
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  const delta = timer.getDelta();
 
   if (controls.isLocked) {
     // Deceleration
@@ -257,11 +259,13 @@ for (let i = 0; i < 200; i++) {
   scene.add(mesh);
 }
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 
 function animate() {
+  timer.update();
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  const delta = timer.getDelta();
   controls.update(delta); // MUST pass delta -- NEVER omit
   renderer.render(scene, camera);
 }

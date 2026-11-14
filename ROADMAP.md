@@ -1,6 +1,12 @@
 # Three.js Skill Package — ROADMAP
 
-## Current Status: B7 DONE — COMPLETE
+## Current Status: r187 migration implemented; validation scope documented
+
+The original B0–B7 table below records the initial release. The r187 migration
+updates all 24 skill compatibility declarations and the affected active references.
+API/import checks and WebGL/WebGPURenderer fallback/R3F browser smoke tests pass.
+Native WebGPU, physics, IFC, XR, audio and KTX2 encoding
+remain separate integration checks; see docs/validation/r187-migration.md.
 
 | Phase | Description | Status | Skills |
 |-------|-------------|--------|--------|

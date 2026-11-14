@@ -1,4 +1,4 @@
-# Anti-Patterns (Three.js Geometries r160+)
+# Anti-Patterns (Three.js Geometries r187)
 
 ## 1. Forgetting needsUpdate After Modifying BufferAttribute
 

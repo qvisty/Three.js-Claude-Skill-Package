@@ -213,7 +213,7 @@ renderer.shadowMap.type = THREE.VSMShadowMap; // changed after first render
 ```javascript
 // ALWAYS set shadow map configuration BEFORE the first render
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 // Then start rendering
 animate();
 ```

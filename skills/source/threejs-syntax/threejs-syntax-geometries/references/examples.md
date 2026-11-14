@@ -1,4 +1,4 @@
-# Working Code Examples (Three.js Geometries r160+)
+# Working Code Examples (Three.js Geometries r187)
 
 ## Example 1: Custom Quad Geometry with Position, Normal, and UV
 

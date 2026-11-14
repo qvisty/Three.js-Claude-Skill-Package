@@ -7,10 +7,10 @@ description: >
   simplification, and gltf-transform.
   Keywords: optimize model, reduce file size, Draco compression, KTX2, gltf-transform, mesh simplification, LOD, GLTF optimize, bundle size, model too big, slow loading, compress 3D model.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-agents-model-optimizer
@@ -80,7 +80,7 @@ Before optimizing, ALWAYS gather these metrics:
 
 ```bash
 # Using gltf-transform CLI
-npx gltf-transform inspect model.glb
+npx --yes @gltf-transform/cli@4.5.1 inspect model.glb
 
 # Key output to check:
 # - Mesh count and total triangle count
@@ -123,30 +123,30 @@ ALWAYS run these operations in this order:
 
 ```bash
 # 1. Remove duplicate accessors and unused data
-npx gltf-transform dedup input.glb deduped.glb
+npx --yes @gltf-transform/cli@4.5.1 dedup input.glb deduped.glb
 
 # 2. Flatten node hierarchy (removes empty nodes)
-npx gltf-transform flatten deduped.glb flat.glb
+npx --yes @gltf-transform/cli@4.5.1 flatten deduped.glb flat.glb
 
 # 3. Join meshes sharing the same material
-npx gltf-transform join flat.glb joined.glb
+npx --yes @gltf-transform/cli@4.5.1 join flat.glb joined.glb
 
-# 4. Weld vertices (merge vertices within tolerance)
-npx gltf-transform weld joined.glb welded.glb --tolerance 0.0001
+# 4. Weld bitwise identical vertices
+npx --yes @gltf-transform/cli@4.5.1 weld joined.glb welded.glb
 
 # 5. Simplify mesh (reduce triangle count)
-npx gltf-transform simplify welded.glb simplified.glb \
+npx --yes @gltf-transform/cli@4.5.1 simplify welded.glb simplified.glb \
   --ratio 0.5 \
   --error 0.001
 
 # 6. Remove unused resources
-npx gltf-transform prune simplified.glb output.glb
+npx --yes @gltf-transform/cli@4.5.1 prune simplified.glb output.glb
 ```
 
 ### Combined Pipeline (Single Command)
 
 ```bash
-npx gltf-transform optimize input.glb output.glb \
+npx --yes @gltf-transform/cli@4.5.1 optimize input.glb output.glb \
   --compress draco \
   --texture-compress ktx2
 ```
@@ -160,10 +160,13 @@ npx gltf-transform optimize input.glb output.glb \
 | Aggressive | 0.25 | 0.005 | LOD1/LOD2 generation |
 | Extreme | 0.10 | 0.01 | LOD3, distant objects only |
 
-### Weld Settings
+### Weld Semantics (4.5.1)
 
-| Tolerance | Effect |
-|-----------|--------|
+`weld` merges bitwise identical vertices; there is no `--tolerance` option.
+ALWAYS inspect topology and attributes before simplifying. NEVER weld across
+intentional normal, material or UV seams by deleting required attributes.
+
+-----------|--------|
 | 0.0001 | Conservative -- merges only nearly-identical vertices |
 | 0.001 | Standard -- good for most models |
 | 0.01 | Aggressive -- may cause visible seams on hard edges |
@@ -191,17 +194,19 @@ Texture type?
 
 ### KTX2 Compression Commands
 
+These commands require KTX-Software (`toktx`) separately. Texture slots use glob
+patterns, not comma-separated lists. Run texture operations before final Draco or
+meshopt compression: intermediate writes decode previously compressed geometry.
+
 ```bash
 # ETC1S: smaller file, lower quality (color maps, ORM)
-npx gltf-transform ktx2 input.glb output.glb \
-  --slots "baseColorTexture,emissiveTexture,occlusionTexture" \
-  --filter "baseColorTexture=etc1s" \
+npx --yes @gltf-transform/cli@4.5.1 etc1s input.glb output.glb \
+  --slots "{baseColorTexture,emissiveTexture,occlusionTexture}" \
   --quality 128
 
 # UASTC: larger file, higher quality (normal maps)
-npx gltf-transform ktx2 input.glb output.glb \
-  --slots "normalTexture" \
-  --filter "normalTexture=uastc"
+npx --yes @gltf-transform/cli@4.5.1 uastc input.glb output.glb \
+  --slots "normalTexture"
 ```
 
 ### KTX2: ETC1S vs UASTC
@@ -218,10 +223,10 @@ npx gltf-transform ktx2 input.glb output.glb \
 
 ```bash
 # Resize all textures to max 1024x1024
-npx gltf-transform resize input.glb output.glb --width 1024 --height 1024
+npx --yes @gltf-transform/cli@4.5.1 resize input.glb output.glb --width 1024 --height 1024
 
 # Resize only textures larger than 2048px
-npx gltf-transform resize input.glb output.glb --width 2048 --height 2048
+npx --yes @gltf-transform/cli@4.5.1 resize input.glb output.glb --width 2048 --height 2048
 ```
 
 ---
@@ -232,10 +237,10 @@ npx gltf-transform resize input.glb output.glb --width 2048 --height 2048
 
 ```bash
 # Default Draco compression
-npx gltf-transform draco input.glb output.glb
+npx --yes @gltf-transform/cli@4.5.1 draco input.glb output.glb
 
 # Draco with quality settings
-npx gltf-transform draco input.glb output.glb \
+npx --yes @gltf-transform/cli@4.5.1 draco input.glb output.glb \
   --quantize-position 14 \
   --quantize-normal 10 \
   --quantize-texcoord 12 \
@@ -257,7 +262,7 @@ Higher bits = better quality, larger file. 14-bit position is sufficient for mos
 
 ```bash
 # Quantize attributes (reduces file size without Draco dependency)
-npx gltf-transform quantize input.glb output.glb
+npx --yes @gltf-transform/cli@4.5.1 quantize input.glb output.glb
 ```
 
 ### Loading Draco-Compressed Models in Three.js
@@ -267,8 +272,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 const dracoLoader = new DRACOLoader();
-// ALWAYS set the decoder path — Draco uses WASM
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+// Custom decoder paths are optional; self-host matching r187 assets when required.
+// r187 resolves its bundled Draco WASM decoder by default.
 dracoLoader.preload();
 
 const gltfLoader = new GLTFLoader();
@@ -289,7 +294,7 @@ import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
 const ktx2Loader = new KTX2Loader();
 // ALWAYS set the transcoder path — KTX2 uses WASM basis_transcoder
-ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/basis/');
+ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/libs/basis/');
 ktx2Loader.detectSupport(renderer);
 
 const gltfLoader = new GLTFLoader();
@@ -316,10 +321,10 @@ After optimization, ALWAYS verify:
 ls -la original.glb optimized.glb
 
 # Validate GLTF structure
-npx gltf-transform inspect optimized.glb
+npx --yes @gltf-transform/cli@4.5.1 inspect optimized.glb
 
 # Check for errors
-npx gltf-transform validate optimized.glb
+npx --yes @gltf-transform/cli@4.5.1 validate optimized.glb
 ```
 
 ---
@@ -339,10 +344,10 @@ npx gltf-transform validate optimized.glb
 
 ```bash
 # Generate LOD chain
-npx gltf-transform simplify model.glb lod0.glb --ratio 1.0
-npx gltf-transform simplify model.glb lod1.glb --ratio 0.5 --error 0.001
-npx gltf-transform simplify model.glb lod2.glb --ratio 0.25 --error 0.005
-npx gltf-transform simplify model.glb lod3.glb --ratio 0.10 --error 0.01
+npx --yes @gltf-transform/cli@4.5.1 simplify model.glb lod0.glb --ratio 1.0
+npx --yes @gltf-transform/cli@4.5.1 simplify model.glb lod1.glb --ratio 0.5 --error 0.001
+npx --yes @gltf-transform/cli@4.5.1 simplify model.glb lod2.glb --ratio 0.25 --error 0.005
+npx --yes @gltf-transform/cli@4.5.1 simplify model.glb lod3.glb --ratio 0.10 --error 0.01
 ```
 
 ### Three.js LOD Implementation
@@ -437,7 +442,7 @@ await document.transform(
   dedup(),
   flatten(),
   join(),
-  weld({ tolerance: 0.0001 }),
+  weld(),
   simplify({ ratio: 0.5, error: 0.001 }),
   textureCompress({ targetFormat: 'ktx2' }),
   draco(),

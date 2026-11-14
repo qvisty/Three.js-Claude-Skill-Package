@@ -12,7 +12,7 @@ All shadow-capable lights (DirectionalLight, SpotLight, PointLight) expose a `.s
 | `.bias` | `number` | `0` | Depth offset to reduce shadow acne; typical range `-0.005` to `0.001` |
 | `.normalBias` | `number` | `0` | Offset along surface normal; reduces acne on curved surfaces |
 | `.mapSize` | `Vector2` | `(512, 512)` | Shadow map resolution; MUST be power-of-two |
-| `.radius` | `number` | `1` | Blur radius for VSMShadowMap; IGNORED by PCF and PCFSoft |
+| `.radius` | `number` | `1` | WebGL PCF filter spread or VSM blur radius |
 | `.blurSamples` | `number` | `8` | Number of blur samples; ONLY used by VSMShadowMap |
 | `.intensity` | `number` | `1` | Shadow darkness; `0` = invisible, `1` = fully opaque |
 | `.map` | `WebGLRenderTarget \| null` | `null` | Auto-generated depth texture; readonly |
@@ -95,11 +95,10 @@ Extends `LightShadow`. Uses 6 `PerspectiveCamera` instances (cubemap faces).
 | Constant | Value | Description |
 |----------|-------|-------------|
 | `THREE.BasicShadowMap` | `0` | No filtering; hard aliased edges |
-| `THREE.PCFShadowMap` | `1` | Percentage-Closer Filtering; fixed kernel |
-| `THREE.PCFSoftShadowMap` | `2` | Variable kernel PCF; softer edges |
+| `THREE.PCFShadowMap` | `1` | Percentage-Closer Filtering; soft shadows in r187 |
 | `THREE.VSMShadowMap` | `3` | Variance Shadow Maps; Gaussian blur |
 
-Set via: `renderer.shadowMap.type = THREE.PCFSoftShadowMap;`
+Set via: `renderer.shadowMap.type = THREE.PCFShadowMap;`
 
 **ALWAYS** set the shadow map type BEFORE creating any shadow maps. Changing the type at runtime requires disposing all existing shadow maps.
 

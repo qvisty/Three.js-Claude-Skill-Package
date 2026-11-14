@@ -1,4 +1,4 @@
-# Anti-Patterns (Three.js Scene Graph r160+)
+# Anti-Patterns (Three.js Scene Graph r187)
 
 ## 1. Using add() Instead of attach() for Reparenting
 

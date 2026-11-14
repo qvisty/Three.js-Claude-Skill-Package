@@ -8,10 +8,10 @@ description: >
   hand tracking, hit testing, teleportation.
   Keywords: VR, AR, XR, WebXR, VRButton, ARButton, immersive, controller, hand tracking, hit test, teleportation, headset, virtual reality, augmented reality, VR app, AR experience.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-xr
@@ -31,7 +31,7 @@ metadata:
 | Method | Signature | Description |
 |--------|-----------|-------------|
 | `getSession()` | `() => XRSession \| null` | Current XR session |
-| `setSessionInit(options)` | `(XRSessionInit) => void` | Configure session features before entry |
+| `setSession(session)` | `(XRSession \| null) => Promise<void>` | Attach/detach a session; button helpers do this for you |
 | `setReferenceSpaceType(type)` | `(string) => void` | Set reference space type |
 | `getController(index)` | `(number) => Group` | Get controller target ray space |
 | `getControllerGrip(index)` | `(number) => Group` | Get controller grip space |
@@ -120,16 +120,14 @@ import { ARButton } from 'three/addons/webxr/ARButton.js';
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.xr.enabled = true;
 
-// Configure AR features BEFORE creating ARButton
-renderer.xr.setSessionInit({
+// Pass AR features to ARButton when requesting the session.
+const sessionInit = {
   requiredFeatures: ['hit-test'],
   optionalFeatures: ['dom-overlay'],
   domOverlay: { root: document.getElementById('overlay') }
-});
+};
 
-document.body.appendChild(ARButton.createButton(renderer, {
-  requiredFeatures: ['hit-test']
-}));
+document.body.appendChild(ARButton.createButton(renderer, sessionInit));
 
 renderer.setAnimationLoop((time, frame) => {
   renderer.render(scene, camera);
@@ -203,10 +201,9 @@ controller0.add(line);
 ```javascript
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 
-// Request hand-tracking feature
-renderer.xr.setSessionInit({
-  optionalFeatures: ['hand-tracking']
-});
+// Request hand tracking when creating the VR session button.
+const sessionInit = { optionalFeatures: ['hand-tracking'] };
+// Use VRButton.createButton(renderer, sessionInit) instead of the basic button.
 
 const handFactory = new XRHandModelFactory();
 
@@ -361,6 +358,13 @@ xrLight.addEventListener('estimationend', () => {
 ```
 
 ---
+
+## r187 XR Camera Contract
+
+The XR aggregate camera transform and projection matrix come from the first eye
+sub-camera. NEVER assume that matrix represents the stereo center or both eyes;
+use renderer.xr.getCamera().cameras for per-eye calculations. Native XR session,
+tracking and device behavior still require a headset/device integration test.
 
 ## Reference Links
 

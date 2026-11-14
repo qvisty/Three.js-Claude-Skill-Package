@@ -14,15 +14,16 @@ Every skill in this package MUST meet the following criteria:
 ### 2. Code-accurate
 - All JavaScript/TypeScript examples MUST be valid and runnable
 - Import statements MUST use ES module syntax (`import { Scene } from 'three'`)
-- API calls MUST match Three.js r160+ signatures
+- API calls MUST match Three.js r187 (`three@0.187.0`) signatures
 - Shader code (GLSL/WGSL) MUST be syntactically valid
-- React Three Fiber JSX MUST follow R3F 8.x conventions
+- React Three Fiber JSX MUST follow R3F 9.8.2 conventions
 
 ### 3. Version-explicit
-- Target: Three.js r160+ (ES modules, MIT license)
-- React Three Fiber: 8.x
-- Drei: latest compatible with R3F 8.x
-- WebGPU Renderer: Three.js built-in (experimental)
+- Target: Three.js r187 (`three@0.187.0`) (ES modules, MIT license)
+- React Three Fiber: 9.8.2 / React 19
+- Drei: 10.7.9
+- WebGPU Renderer: Three.js built-in; explicit async initialization, automatic WebGL 2 fallback
+- Runtime must provide WeakRef and FinalizationRegistry (required by r187 renderers)
 - Note breaking changes between Three.js revisions where applicable
 
 ### 4. Anti-pattern-free

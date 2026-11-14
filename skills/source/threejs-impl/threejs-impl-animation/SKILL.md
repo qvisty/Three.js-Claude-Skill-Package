@@ -4,14 +4,14 @@ description: >
   Use when playing animations, crossfading between animation states,
   or loading skeletal animations from GLTF in Three.js. Prevents the
   common mistake of not calling mixer.update(delta) every frame,
-  wrong crossfade setup, or missing Clock. Covers AnimationMixer,
+  wrong crossfade setup, or missing Timer updates. Covers AnimationMixer,
   AnimationClip, AnimationAction, KeyframeTrack, crossfade, blending.
-  Keywords: animation, AnimationMixer, AnimationClip, AnimationAction, crossfade, skeletal, GLTF animation, keyframe, blend, Clock, camera animation, smooth camera, fly to, tween, GSAP.
+  Keywords: animation, AnimationMixer, AnimationClip, AnimationAction, crossfade, skeletal, GLTF animation, keyframe, blend, Timer, camera animation, smooth camera, fly to, tween, GSAP.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-animation
@@ -24,7 +24,7 @@ metadata:
 AnimationClip        (data: array of KeyframeTrack objects)
   └── AnimationAction  (playback controller: play, pause, fade, crossfade)
         └── AnimationMixer (master scheduler: one per animated root object)
-              └── Clock    (provides delta time for mixer.update)
+              └── Timer    (update once per frame, then read delta)
 ```
 
 ALWAYS create exactly ONE `AnimationMixer` per animated root object.
@@ -44,7 +44,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 let mixer;
 
 const loader = new GLTFLoader();
@@ -59,7 +60,8 @@ loader.load('character.glb', (gltf) => {
 });
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -70,7 +72,7 @@ renderer.setAnimationLoop(animate);
 
 **NEVER** forget to call `mixer.update(delta)` in the render loop -- animations will NOT play without it.
 
-**NEVER** use `new Date()` or `performance.now()` to compute delta manually -- ALWAYS use `THREE.Clock` or `renderer.setAnimationLoop` which provides stable frame timing.
+**NEVER** use `new Date()` or `performance.now()` to compute delta manually -- ALWAYS call `timer.update()` once per frame and read `timer.getDelta()` in seconds. `setAnimationLoop` supplies a timestamp in milliseconds, not a delta.
 
 **NEVER** call `mixer.clipAction(clip)` repeatedly in the render loop -- it caches internally, but the lookup is unnecessary overhead. ALWAYS store the returned action in a variable.
 
@@ -266,22 +268,25 @@ const clip = new THREE.AnimationClip(name, duration, tracks, blendMode);
 
 ---
 
-## Clock
+## Timer (r187)
 
-### Constructor
+`Clock` is deprecated since r183. ALWAYS use `Timer` for new standalone loops.
 
 ```js
-const clock = new THREE.Clock(autoStart); // autoStart defaults to true
+const timer = new THREE.Timer();
+timer.connect(document); // Pause timing while the page is hidden.
+renderer.setAnimationLoop(() => {
+  timer.update(); // Exactly once per frame, before any consumer.
+  const delta = timer.getDelta();
+  mixer.update(delta);
+  renderer.render(scene, camera);
+});
+// On teardown: renderer.setAnimationLoop(null); timer.dispose();
 ```
 
-### Methods
-
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `.getDelta()` | number | Seconds since last `getDelta()` call |
-| `.getElapsedTime()` | number | Total elapsed time in seconds |
-| `.start()` | void | Start the clock |
-| `.stop()` | void | Stop without resetting |
+`getDelta()` and `getElapsed()` read the last update without advancing time.
+Share one delta across physics, controls and animation. NEVER call `update()`
+separately for each consumer. R3F owns its clock: use the `useFrame` delta there.
 
 ---
 
@@ -354,5 +359,5 @@ morphAction.play();
 - https://threejs.org/docs/#api/en/animation/AnimationAction
 - https://threejs.org/docs/#api/en/animation/AnimationClip
 - https://threejs.org/docs/#api/en/animation/KeyframeTrack
-- https://threejs.org/docs/#api/en/core/Clock
+- https://threejs.org/docs/#api/en/core/Timer
 - https://threejs.org/examples/#webgl_animation_skinning_blending

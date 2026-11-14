@@ -58,7 +58,7 @@
 | Lighting | HDR environment + DirectionalLight (sun) + PointLights (fixtures) | Realistic indoor/outdoor |
 | Material | MeshStandardMaterial with texture maps | Realistic surfaces |
 | Environment | Architectural HDR (apartment or lobby preset) | Accurate reflections |
-| Shadows | PCFSoftShadowMap, DirectionalLight shadow | Realistic sun shadows |
+| Shadows | PCFShadowMap, DirectionalLight shadow | Realistic sun shadows |
 | Post-processing | GTAO + subtle bloom + SMAA | Depth and realism |
 | Background | HDR environment as background | Visible through windows |
 
@@ -67,7 +67,7 @@
 ```
 1. WebGLRenderer({ antialias: true })
 2. renderer.shadowMap.enabled = true
-3. renderer.shadowMap.type = PCFSoftShadowMap
+3. renderer.shadowMap.type = PCFShadowMap
 4. renderer.toneMapping = ACESFilmicToneMapping
 5. PerspectiveCamera(65, aspect, 0.1, 500)
 6. camera.position.set(0, 1.6, 5) — eye height
@@ -94,7 +94,7 @@
 | Lighting | DirectionalLight (sun) + AmbientLight + PointLights (effects) | Game lighting |
 | Material | Mix of Standard and Lambert | Balance quality vs performance |
 | Environment | Procedural sky or skybox | Game world backdrop |
-| Shadows | PCFSoftShadowMap, 1 DirectionalLight shadow | Performance budget |
+| Shadows | PCFShadowMap, 1 DirectionalLight shadow | Performance budget |
 | Post-processing | SSAO + bloom (for effects) + FXAA | Game visual quality |
 | Physics | Rapier (via @dimforge/rapier3d-compat) | Collision and dynamics |
 
@@ -102,7 +102,7 @@
 
 ```
 1. WebGLRenderer({ antialias: false }) — use FXAA post-process instead
-2. renderer.shadowMap.enabled = true, type = PCFSoftShadowMap
+2. renderer.shadowMap.enabled = true, type = PCFShadowMap
 3. PerspectiveCamera(60, aspect, 0.1, 1000)
 4. DirectionalLight for sun with optimized shadow frustum
 5. AmbientLight or HemisphereLight for fill

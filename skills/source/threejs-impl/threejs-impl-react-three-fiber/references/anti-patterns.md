@@ -1,6 +1,6 @@
 # anti-patterns.md -- React Three Fiber Anti-Patterns
 
-> What NOT to do with @react-three/fiber 8.x+. Each anti-pattern includes the mistake, why it fails, and the correct alternative.
+> What NOT to do with @react-three/fiber 9.8.2. Each anti-pattern includes the mistake, why it fails, and the correct alternative.
 
 ---
 

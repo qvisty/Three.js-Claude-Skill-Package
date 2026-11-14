@@ -1,4 +1,4 @@
-# API Signatures Reference (Three.js Scene Graph r160+)
+# API Signatures Reference (Three.js Scene Graph r187)
 
 ## Object3D
 

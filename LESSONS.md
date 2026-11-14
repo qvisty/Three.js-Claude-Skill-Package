@@ -63,3 +63,18 @@ _Lessons inherited from Blender, ERPNext, and Draw.io skill packages._
 ### L-015: NEVER Interpret Fundamental Questions
 **Source:** User feedback, 2026-03-16
 **Lesson:** NEVER interpret fundamental questions yourself. ALWAYS ask the user explicitly. Record open questions in OPEN-QUESTIONS.md. This applies to all architecture, scope, approach, and tooling decisions. Interpretations are ONLY allowed for trivial implementation details.
+
+### L-016: Migrations Need API and Runtime Evidence
+**Date:** 2026-11-14
+**Lesson:** A new compatibility label does not validate old examples. Check actual
+package exports and changed API behavior, then render representative scenes.
+Timer getters do not advance time; preserve R3F's framework-owned Clock. Test
+WebGPURenderer's fallback as the same renderer, with its own node pipeline.
+
+### L-017: Screenshot Capture Must Follow a Rendered Frame
+**Date:** 2026-11-14
+**Lesson:** A resize clears the canvas before the next render. Awaiting canvas
+size alone can produce a blank screenshot despite a working renderer. Capture
+inside the rendered frame, synchronize the post-resize frame size, and visually
+inspect the resulting artifact. Frame counters alone do not prove animation;
+assert a scene object's rotation actually changes.

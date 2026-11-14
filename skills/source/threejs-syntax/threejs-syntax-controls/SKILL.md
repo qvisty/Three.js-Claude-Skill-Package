@@ -8,10 +8,10 @@ description: >
   FlyControls, PointerLockControls, TransformControls.
   Keywords: OrbitControls, controls, camera controls, orbit, pan, zoom, MapControls, FlyControls, PointerLockControls, TransformControls, rotate view, move camera, mouse controls, drag to rotate.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-syntax-controls
@@ -32,7 +32,7 @@ metadata:
 | Unconstrained rotation (no gimbal lock) | ArcballControls | Full spherical rotation with animation |
 | Unconstrained rotation (simpler) | TrackballControls | Like OrbitControls but no pole constraint |
 
-### Import Paths (Three.js r160+)
+### Import Paths (Three.js r187)
 
 ```javascript
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -46,7 +46,7 @@ import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 import { DragControls } from 'three/addons/controls/DragControls.js';
 ```
 
-**ALWAYS** use `'three/addons/controls/...'` for r160+. The legacy path `'three/examples/jsm/controls/...'` still works but is deprecated.
+**ALWAYS** use `'three/addons/controls/OrbitControls.js'` and equivalent `.js` addon paths. They resolve under the documented browser import map and bundlers.
 
 ### Critical Warnings
 

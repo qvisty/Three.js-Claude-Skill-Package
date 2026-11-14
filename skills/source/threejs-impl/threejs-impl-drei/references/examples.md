@@ -11,7 +11,7 @@ import { Suspense } from 'react'
 
 function ProductViewer() {
   return (
-    <Canvas shadows camera={{ position: [0, 2, 5], fov: 50 }}>
+    <Canvas shadows="percentage" camera={{ position: [0, 2, 5], fov: 50 }}>
       <Suspense fallback={null}>
         <Center>
           <Product />
@@ -128,7 +128,7 @@ import { Suspense } from 'react'
 
 function GlassScene() {
   return (
-    <Canvas shadows camera={{ position: [0, 1.5, 4], fov: 45 }}>
+    <Canvas shadows="percentage" camera={{ position: [0, 1.5, 4], fov: 45 }}>
       <color attach="background" args={['#f0f0f0']} />
       <Suspense fallback={null}>
         <Center>

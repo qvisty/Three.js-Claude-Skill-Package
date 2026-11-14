@@ -17,7 +17,8 @@ renderer.xr.cameraAutoUpdate: boolean        // Default: true. Auto-updates came
 ```typescript
 // Session management
 renderer.xr.getSession(): XRSession | null
-renderer.xr.setSessionInit(sessionInit: XRSessionInit): void
+renderer.xr.setSession(session: XRSession | null): Promise<void>
+// Pass sessionInit to VRButton.createButton(renderer, sessionInit) or ARButton.createButton(renderer, sessionInit).
 renderer.xr.setReferenceSpaceType(type: string): void
 renderer.xr.getReferenceSpace(): XRReferenceSpace | null
 
@@ -42,7 +43,7 @@ renderer.xr.getEnvironmentBlendMode(): string           // 'opaque' | 'additive'
 ```typescript
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 
-VRButton.createButton(renderer: THREE.WebGLRenderer): HTMLElement
+VRButton.createButton(renderer: THREE.WebGLRenderer, sessionInit?: XRSessionInit): HTMLElement
 ```
 
 Returns a DOM button element that:
