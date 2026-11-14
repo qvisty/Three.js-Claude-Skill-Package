@@ -17,6 +17,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   RenderPipeline, batching and glTF Transform recipes.
 
 ### Added
+- Dependency-free Claude Code installer with per-file verification, read-only checks,
+  safe repeatable updates, local-edit protection, backup and rollback support.
+- Installer integration tests and documented macOS/Linux/WSL and PowerShell commands.
 - Locked development dependencies and repeatable import/API/browser validation.
 - r187 regression tests for target coordinates at DPR 2, PMREM generation and PBR
   rendering, iridescence serialization and numeric pixelation size.

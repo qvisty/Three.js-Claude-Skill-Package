@@ -120,8 +120,10 @@
     ]
   },
   "scripts": {
-    "test": "node scripts/validate-skills.mjs",
-    "test:browser": "node scripts/browser-smoke.mjs"
+    "test": "node --test scripts/install-claude-skills.test.mjs && node scripts/validate-skills.mjs",
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "skills:install": "node scripts/install-claude-skills.mjs",
+    "skills:check": "node scripts/install-claude-skills.mjs --check"
   },
   "devDependencies": {
     "@react-three/drei": "10.7.9",

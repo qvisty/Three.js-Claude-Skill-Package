@@ -50,23 +50,34 @@ All 24 skills target r187; this does not certify every integration or code fragm
 
 ## Installation in Claude Code
 
-See the [Danish installation and usage guide](docs/CLAUDE-CODE-DA.md) for macOS,
-Linux/WSL and Windows PowerShell commands, verification, direct skill invocation,
-and updates. A [copy-ready Danish starter prompt](docs/CLAUDE-CODE-PROMPT-DA.md)
-is included.
-
-Clone this maintained fork, then copy the 24 individual directories from
-`skills/source/*/*` into your app project's `.claude/skills/`, keeping each
-`SKILL.md` with its `references/` directory:
+Use Node.js 20+ to install all 24 skills into an existing app project. No dependency
+installation is needed in this repository:
 
 ```bash
 git clone https://github.com/qvisty/Three.js-Claude-Skill-Package.git
+node Three.js-Claude-Skill-Package/scripts/install-claude-skills.mjs --project "/path/to/your/app"
 ```
 
-Start Claude Code in your app project. It can select relevant skills from your
-request; invoke `/threejs-core-renderer` directly to check discovery. Copy only
-the skill directories; this repository's CLAUDE.md is for maintaining the package.
-Installing the Markdown skills does not install application dependencies.
+The installer copies the registered skills, references, assets and license notices
+into `<project>/.claude/skills/` and verifies file hashes. Run it again after
+`git pull --ff-only` to update. It preserves unrelated skills and stops before
+replacing local edits. Use `--force` to back up and replace modified skill directories;
+backups live outside Claude's discovery directory. `--check` verifies without writing.
+
+From the skill repository you can also use:
+
+```bash
+npm run skills:install -- --project "/path/to/your/app"
+npm run skills:check -- --project "/path/to/your/app"
+```
+
+See the [Danish installation and usage guide](docs/CLAUDE-CODE-DA.md) for Windows
+PowerShell and macOS/Linux/WSL commands, updates and backup behavior. A
+[copy-ready Danish starter prompt](docs/CLAUDE-CODE-PROMPT-DA.md) is included.
+
+Start a new Claude Code session in your app project. Claude can select relevant
+skills from your request; invoke `/threejs-core-renderer` to check discovery. The
+installer does not copy this repository's maintenance CLAUDE.md or install app dependencies.
 
 ## Skills Overview
 
