@@ -102,7 +102,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFShadowMap;
 
 // Later, at runtime...
-renderer.shadowMap.type = PCFSoftShadowMap; // triggers full shader recompilation
+renderer.shadowMap.type = PCFShadowMap; // triggers full shader recompilation
 ```
 
 ### Why It Fails
@@ -114,7 +114,7 @@ Changing `shadowMap.type` after the first render forces Three.js to recompile AL
 ```javascript
 // Set shadow map type ONCE at initialization, before any render call
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFSoftShadowMap;
+renderer.shadowMap.type = PCFShadowMap;
 ```
 
 ALWAYS decide the shadow map type at initialization. NEVER change it at runtime.

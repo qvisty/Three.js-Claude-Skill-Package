@@ -1,6 +1,6 @@
 # examples.md -- React Three Fiber Working Examples
 
-> Verified patterns for @react-three/fiber 8.x+ with React 18+.
+> Verified patterns for @react-three/fiber 9.8.2 with React 19.
 
 ---
 
@@ -8,6 +8,7 @@
 
 ```tsx
 import { Canvas, useFrame } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
 import { useRef } from 'react'
 import * as THREE from 'three'
 
@@ -34,6 +35,7 @@ export default function App() {
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 5, 5]} />
       <SpinningBox />
+      <OrbitControls makeDefault />
     </Canvas>
   )
 }
@@ -50,7 +52,7 @@ export default function App() {
 
 ```tsx
 import { Canvas, useLoader } from '@react-three/fiber'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { Suspense } from 'react'
 
 // Preload at module scope for instant availability
@@ -137,8 +139,8 @@ export default function Configurator() {
 ## Example 4: Custom Class with extend() and Events
 
 ```tsx
-import { Canvas, extend, useFrame } from '@react-three/fiber'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { Canvas, extend, useFrame, useThree, type ThreeElement } from '@react-three/fiber'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { useRef, useState } from 'react'
 import * as THREE from 'three'
 
@@ -146,17 +148,17 @@ import * as THREE from 'three'
 extend({ OrbitControls })
 
 // Declare the JSX intrinsic element for TypeScript
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      orbitControls: any
-    }
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    orbitControls: ThreeElement<typeof OrbitControls>
   }
 }
 
 function Controls() {
   const { camera, gl } = useThree()
-  return <orbitControls args={[camera, gl.domElement]} />
+  const controls = useRef<OrbitControls>(null!)
+  useFrame(() => controls.current?.update())
+  return <orbitControls ref={controls} args={[camera, gl.domElement]} enableDamping />
 }
 
 function HoverableSphere() {

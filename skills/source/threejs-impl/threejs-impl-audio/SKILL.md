@@ -8,10 +8,10 @@ description: >
   PositionalAudio, AudioAnalyser.
   Keywords: audio, sound, AudioListener, PositionalAudio, 3D audio, spatial audio, music, AudioAnalyser, Web Audio API, play sound, add music, sound in 3D scene.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-audio

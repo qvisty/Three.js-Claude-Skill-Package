@@ -1,4 +1,4 @@
-# Working Code Examples (Three.js Scene Graph r160+)
+# Working Code Examples (Three.js Scene Graph r187)
 
 ## Example 1: Basic Scene Setup
 
@@ -240,7 +240,7 @@ import {
   MeshStandardMaterial, MeshBasicMaterial,
   Fog, FogExp2, Color, ACESFilmicToneMapping, SRGBColorSpace
 } from 'three';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 const scene = new Scene();
 scene.background = new Color(0xaabbcc);
@@ -278,8 +278,8 @@ sky.position.set(0, 100, -200);
 scene.add(sky);
 
 // Load HDR environment for PBR lighting
-const rgbeLoader = new RGBELoader();
-rgbeLoader.load('environment.hdr', (texture) => {
+const hdrLoader = new HDRLoader();
+hdrLoader.load('environment.hdr', (texture) => {
   scene.environment = texture;
   scene.environmentIntensity = 0.8;
 });

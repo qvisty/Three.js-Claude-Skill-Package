@@ -11,7 +11,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 // Set up Draco decoder
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+// r187 resolves its bundled Draco WASM decoder by default.
 dracoLoader.preload(); // Pre-fetch WASM for faster first load
 
 // Set up GLTF loader
@@ -54,7 +54,7 @@ Track loading progress across multiple loaders for a loading screen.
 ```javascript
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 const progressBar = document.getElementById('progress-bar');
 const loadingScreen = document.getElementById('loading-screen');
@@ -81,13 +81,13 @@ manager.onError = (url) => {
 // All loaders share the same manager
 const textureLoader = new THREE.TextureLoader(manager);
 const gltfLoader = new GLTFLoader(manager);
-const rgbeLoader = new RGBELoader(manager);
+const hdrLoader = new HDRLoader(manager);
 
 // Load assets -- manager tracks all of them
 const diffuse = textureLoader.load('/textures/diffuse.jpg');
 const normal = textureLoader.load('/textures/normal.jpg');
 gltfLoader.load('/models/scene.glb', (gltf) => { scene.add(gltf.scene); });
-rgbeLoader.load('/env/studio.hdr', (texture) => {
+hdrLoader.load('/env/studio.hdr', (texture) => {
   texture.mapping = THREE.EquirectangularReflectionMapping;
   scene.environment = texture;
 });
@@ -95,20 +95,20 @@ rgbeLoader.load('/env/studio.hdr', (texture) => {
 
 ---
 
-## Example 3: HDR Environment Map with RGBELoader
+## Example 3: HDR Environment Map with HDRLoader
 
 Load an HDR environment map for physically-based lighting and reflections.
 
 ```javascript
 import * as THREE from 'three';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 
-const rgbeLoader = new RGBELoader();
-rgbeLoader.load('/environments/sunset.hdr', (texture) => {
+const hdrLoader = new HDRLoader();
+hdrLoader.load('/environments/sunset.hdr', (texture) => {
   texture.mapping = THREE.EquirectangularReflectionMapping;
 
   // Use as environment lighting (affects all PBR materials)
@@ -163,7 +163,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 // Draco decoder for compressed geometry
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+// r187 resolves its bundled Draco WASM decoder by default.
 
 // KTX2 transcoder for compressed textures
 const ktx2Loader = new KTX2Loader();

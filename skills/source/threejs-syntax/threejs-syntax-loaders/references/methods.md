@@ -189,13 +189,13 @@ new THREE.CubeTextureLoader(manager?: THREE.LoadingManager)
 
 ---
 
-## RGBELoader
+## HDRLoader
 
 ### Constructor
 
 ```javascript
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-new RGBELoader(manager?: THREE.LoadingManager)
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+new HDRLoader(manager?: THREE.LoadingManager)
 ```
 
 ### Methods

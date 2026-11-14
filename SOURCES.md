@@ -51,3 +51,29 @@
 - ALWAYS verify API patterns against the Three.js source code on GitHub
 - NEVER rely on unofficial tutorials without cross-checking against official docs
 - ALWAYS note the Three.js revision number (rXXX) when documenting version-specific behavior
+
+## r186 Migration Sources (2026-11-14)
+
+- Reference: qvisty/threejs-skills, commit `0e181866f095b5f06d005133876e926515390d95`.
+- Target before migration: qvisty/Three.js-Claude-Skill-Package, commit `6c190f0db95d6e4b77d7843d181c6d3325c09d0e`.
+- Authoritative published source: npm `three@0.186.1` (`src/core/Timer.js`,
+  `src/renderers/webgl/`, `src/renderers/common/`, `src/materials/ShaderMaterial.js`,
+  `examples/jsm/loaders/`, `examples/jsm/tsl/display/`).
+- Published exports/peer contracts: Fiber 9.8.2, Drei 10.7.9; React 19.2.0.
+- glTF Transform CLI 4.5.1 built-in help for weld, etc1s and uastc.
+- New verification evidence: docs/validation/r186-migration.md.
+
+These entries supersede older release assumptions in historical research.
+
+## r187 Update Sources (2026-11-14)
+
+- npm latest dist-tag: `three@0.187.0`; published gitHead
+  `7e89746a687bb88271253698fa108b1dd59825d0`.
+- [Official Migration Guide, 186 → 187](https://github.com/mrdoob/three.js/wiki/Migration-Guide#186--187).
+  The guide also includes upcoming r188 material, which is outside this target.
+- [Published r187 source](https://github.com/mrdoob/three.js/tree/7e89746a687bb88271253698fa108b1dd59825d0):
+  PMREMGenerator, WebGLRenderer, MeshPhysicalMaterial, Light, Normal node accessors,
+  StorageBufferNode, PixelationPassNode, VRButton/ARButton and WebXRManager.
+- npm peer metadata for Fiber 9.8.2 and Drei 10.7.9 accepts three@0.187.0 and React 19.
+- Current evidence: docs/validation/r187-migration.md. The sibling reference and
+  the r186 report remain unchanged historical sources.

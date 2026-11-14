@@ -1,0 +1,103 @@
+{
+  "startedAt": "2026-11-14T02:45:16.266Z",
+  "completedAt": "2026-11-14T02:45:21.764Z",
+  "results": [
+    {
+      "case": "webgl",
+      "status": "passed",
+      "revision": "187",
+      "pixels": [
+        19,
+        86,
+        178,
+        255
+      ],
+      "initialRotation": 0.5676,
+      "finalRotation": 0.5842,
+      "resize": {
+        "width": 480,
+        "height": 300,
+        "aspect": 1.6
+      },
+      "releaseChecks": {
+        "revision": "187",
+        "targetViewport": [
+          0,
+          0,
+          8,
+          16
+        ],
+        "targetScissor": [
+          0,
+          0,
+          8,
+          16
+        ],
+        "left": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "right": [
+          0,
+          0,
+          255,
+          255
+        ],
+        "canvasDpr": 2,
+        "pmremCube": true,
+        "physicalMaterialPixel": [
+          127,
+          127,
+          127,
+          255
+        ]
+      },
+      "errors": [],
+      "screenshot": "/workspace/threejs-test-results/r187/webgl.png"
+    },
+    {
+      "case": "fallback",
+      "status": "passed",
+      "revision": "187",
+      "pixels": [
+        255,
+        236,
+        232,
+        255
+      ],
+      "initialRotation": 0.43400000000000005,
+      "finalRotation": 0.4974000000000233,
+      "resize": {
+        "width": 480,
+        "height": 300,
+        "aspect": 1.6
+      },
+      "releaseChecks": null,
+      "errors": [],
+      "screenshot": "/workspace/threejs-test-results/r187/fallback.png"
+    },
+    {
+      "case": "fiber",
+      "status": "passed",
+      "revision": "187",
+      "pixels": [
+        3,
+        49,
+        144,
+        255
+      ],
+      "initialRotation": 0.0455,
+      "finalRotation": 0.062149999999994175,
+      "resize": {
+        "width": 480,
+        "height": 300,
+        "aspect": 1.6
+      },
+      "releaseChecks": null,
+      "errors": [],
+      "screenshot": "/workspace/threejs-test-results/r187/fiber.png"
+    }
+  ]
+}

@@ -7,10 +7,10 @@ description: >
   post-processing pipeline. Orchestrates other Three.js skills.
   Keywords: create scene, build 3D, Three.js project, scene setup, visualization, product viewer, 3D application, scene composition, how to start Three.js, new 3D project, basic scene.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-agents-scene-builder
@@ -55,14 +55,14 @@ This skill is an **orchestration guide** for building complete Three.js scenes. 
 
 | Scene Type | Primary Light | Fill Light | Shadows |
 |------------|--------------|------------|---------|
-| Outdoor / daylight | DirectionalLight (sun) | HemisphereLight (sky/ground) | DirectionalLight shadow, PCFSoftShadowMap |
+| Outdoor / daylight | DirectionalLight (sun) | HemisphereLight (sky/ground) | DirectionalLight shadow, PCFShadowMap |
 | Indoor / room | PointLight or SpotLight (fixtures) | AmbientLight (low) | SpotLight shadows, limit to 2-3 |
 | Studio / product | SpotLight (key) + SpotLight (rim) | AmbientLight or HemisphereLight | ContactShadows (Drei) or AccumulativeShadows |
 | Stylized / toon | DirectionalLight | HemisphereLight | Optional; BasicShadowMap for hard edges |
 | HDR environment only | None (IBL provides all lighting) | None | ContactShadows or AccumulativeShadows |
 | Night / dark | SpotLight (focused pools) | AmbientLight (very low, ~0.05) | SpotLight shadows |
 
-### Step 2: Lighting Intensity (Physically Correct, r160+)
+### Step 2: Lighting Intensity (Physically Correct, r187)
 
 | Light Type | Unit | Typical Indoor | Typical Outdoor |
 |------------|------|---------------|-----------------|
@@ -101,7 +101,7 @@ This skill is an **orchestration guide** for building complete Three.js scenes. 
 | Glass / transparent | MeshPhysicalMaterial (`transmission: 1`) | Or Drei's MeshTransmissionMaterial in R3F |
 | Reflective floor | Drei MeshReflectorMaterial | R3F only |
 | Custom shader | ShaderMaterial or RawShaderMaterial | Full GLSL control |
-| Node-based (WebGPU) | MeshStandardNodeMaterial | TSL node system; r160+ |
+| Node-based (WebGPU) | MeshStandardNodeMaterial | TSL node system; r187 |
 
 **Critical rules:**
 - NEVER use MeshPhysicalMaterial when MeshStandardMaterial suffices — it is significantly more expensive
@@ -159,7 +159,7 @@ This skill is an **orchestration guide** for building complete Three.js scenes. 
 
 | Visual Goal | Approach | Implementation |
 |-------------|----------|---------------|
-| Realistic reflections + ambient | HDR environment map | `scene.environment = pmremGenerator.fromEquirectangular(hdrTexture)` |
+| Realistic reflections + ambient | HDR environment map | `hdrTexture.mapping = EquirectangularReflectionMapping; scene.environment = hdrTexture` |
 | Solid color background | `scene.background = new Color(...)` | Simplest option |
 | Gradient background | Custom shader on background plane | Or CSS gradient behind transparent canvas |
 | Skybox | CubeTexture on `scene.background` | 6 face images |
@@ -168,8 +168,8 @@ This skill is an **orchestration guide** for building complete Three.js scenes. 
 | R3F environment | Drei `<Environment preset="studio" />` | Presets: apartment, city, dawn, forest, lobby, night, park, studio, sunset, warehouse |
 
 **Critical rules:**
-- ALWAYS use `PMREMGenerator` to prefilter environment maps for PBR materials
-- NEVER use unprocessed HDR textures as `scene.environment` — they MUST be PMREM-processed
+- ALWAYS set EquirectangularReflectionMapping on an HDR panorama; the renderer prefilters it automatically
+- Use explicit PMREMGenerator for scene capture or controlled preprocessing; retain and dispose its output target separately
 - Setting `scene.environment` provides IBL to ALL PBR materials automatically
 
 **Cross-reference:** `threejs-syntax-materials` for environment map usage on materials.

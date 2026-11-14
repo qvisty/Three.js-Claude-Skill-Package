@@ -1,6 +1,6 @@
 # threejs-impl-audio — Examples
 
-> Working code examples for Three.js audio (r160+). All examples use ES module imports.
+> Working code examples for Three.js audio (r187). All examples use ES module imports.
 
 ---
 

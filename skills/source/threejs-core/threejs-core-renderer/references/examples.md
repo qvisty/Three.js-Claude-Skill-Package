@@ -1,6 +1,6 @@
 # threejs-core-renderer — Working Examples
 
-> All examples use ES module imports and are verified against Three.js r160+.
+> All examples use ES module imports and target Three.js r187.
 > Every example is complete and runnable.
 
 ---
@@ -12,7 +12,7 @@ Full initialization with renderer, camera, resize handling, and animation loop.
 ```javascript
 import {
   WebGLRenderer, Scene, PerspectiveCamera, SRGBColorSpace,
-  ACESFilmicToneMapping, PCFSoftShadowMap, BoxGeometry,
+  ACESFilmicToneMapping, PCFShadowMap, BoxGeometry,
   MeshStandardMaterial, Mesh, DirectionalLight, AmbientLight
 } from 'three';
 
@@ -24,7 +24,7 @@ renderer.outputColorSpace = SRGBColorSpace;
 renderer.toneMapping = ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFSoftShadowMap;
+renderer.shadowMap.type = PCFShadowMap;
 document.body.appendChild(renderer.domElement);
 
 // Scene
@@ -270,7 +270,7 @@ Pre-compiles shaders to avoid frame drops when the scene first appears.
 ```javascript
 import {
   WebGLRenderer, Scene, PerspectiveCamera, SRGBColorSpace,
-  ACESFilmicToneMapping, PCFSoftShadowMap, BoxGeometry,
+  ACESFilmicToneMapping, PCFShadowMap, BoxGeometry,
   MeshStandardMaterial, Mesh, DirectionalLight, AmbientLight
 } from 'three';
 
@@ -280,7 +280,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = SRGBColorSpace;
 renderer.toneMapping = ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFSoftShadowMap;
+renderer.shadowMap.type = PCFShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const scene = new Scene();

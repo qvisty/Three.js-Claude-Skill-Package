@@ -8,10 +8,10 @@ description: >
   21 built-in geometries, InstancedMesh, ExtrudeGeometry, custom geometry.
   Keywords: BufferGeometry, BoxGeometry, SphereGeometry, PlaneGeometry, InstancedMesh, BufferAttribute, geometry, shape, extrude, custom mesh, particles, point cloud, particle system, create shape.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-syntax-geometries
@@ -131,7 +131,7 @@ new THREE.BufferAttribute(array: TypedArray, itemSize: number, normalized?: bool
 | `PlaneGeometry` | `(width=1, height=1, wSeg=1, hSeg=1)` |
 | `CylinderGeometry` | `(radTop=1, radBot=1, height=1, radSeg=32, hSeg=1, open, thetaStart, thetaLen)` |
 | `ConeGeometry` | `(radius=1, height=1, radSeg=32, hSeg=1, open, thetaStart, thetaLen)` |
-| `CapsuleGeometry` | `(radius=1, length=1, capSeg=4, radSeg=8)` |
+| `CapsuleGeometry` | `(radius=1, height=1, capSeg=4, radSeg=8, heightSeg=1)` |
 | `TorusGeometry` | `(radius=1, tube=0.4, radSeg=12, tubSeg=48, arc=2PI)` |
 | `TorusKnotGeometry` | `(radius=1, tube=0.4, tubSeg=64, radSeg=8, p=2, q=3)` |
 | `CircleGeometry` | `(radius=1, seg=32, thetaStart=0, thetaLen=2PI)` |
@@ -256,7 +256,7 @@ const mesh = new THREE.InstancedMesh(geometry, material, count);
 | < 10 | Use individual `Mesh` objects |
 | 10 - 100 | Either approach; profile your case |
 | 100 - 10,000 | ALWAYS use `InstancedMesh` |
-| > 10,000 | Use `InstancedMesh` with spatial subdivision or `BatchedMesh` (r160+) |
+| > 10,000 | Use `InstancedMesh` with spatial subdivision or `BatchedMesh` (r187) |
 
 ### Custom Per-Instance Attributes
 

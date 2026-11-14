@@ -8,10 +8,10 @@ description: >
   metalness/roughness, MeshPhysicalMaterial, texture maps, color space.
   Keywords: MeshStandardMaterial, MeshPhysicalMaterial, material, texture, PBR, metalness, roughness, normalMap, color space, SRGBColorSpace, blurry texture, pixelated, texture quality, filtering.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-syntax-materials
@@ -100,7 +100,7 @@ const material = new MeshStandardMaterial({
   metalnessMap: null,       // Per-pixel metalness
   normalMap: null,          // Surface normal perturbation
   normalScale: new Vector2(1, 1),
-  aoMap: null,              // Ambient occlusion (requires uv2)
+  aoMap: null,              // Ambient occlusion (uses texture.channel; default uv)
   aoMapIntensity: 1.0,
   emissive: 0x000000,       // Emissive color
   emissiveMap: null,        // Emissive texture
@@ -113,7 +113,7 @@ const material = new MeshStandardMaterial({
   displacementScale: 1.0,
   displacementBias: 0.0,
   alphaMap: null,           // Per-pixel transparency
-  lightMap: null,           // Baked lighting (requires uv2)
+  lightMap: null,           // Baked lighting (uses texture.channel; default uv)
   lightMapIntensity: 1.0,
   flatShading: false,
   wireframe: false,
@@ -145,7 +145,8 @@ Extends `MeshStandardMaterial` with ALL its properties, plus:
 | `sheenRoughness` | `float` | `1.0` | Sheen roughness |
 | `iridescence` | `float` | `0.0` | Thin-film interference (0-1) |
 | `iridescenceIOR` | `float` | `1.3` | Iridescence index of refraction |
-| `iridescenceThicknessRange` | `[float, float]` | `[100, 400]` | Thin-film thickness range (nm) |
+| `iridescenceThicknessMinimum` | `float` | `100` | Minimum thin-film thickness (nm) |
+| `iridescenceThicknessMaximum` | `float` | `400` | Maximum thin-film thickness (nm); used when no thickness map is present |
 | `anisotropy` | `float` | `0.0` | Anisotropic reflection strength |
 | `anisotropyRotation` | `float` | `0.0` | Anisotropy rotation (radians) |
 | `specularIntensity` | `float` | `1.0` | Specular layer intensity |
@@ -180,7 +181,7 @@ Extends `MeshStandardMaterial` with ALL its properties, plus:
 | `transmissionMap` | `NoColorSpace` | R channel |
 | `thicknessMap` | `NoColorSpace` | R channel |
 | `iridescenceMap` | `NoColorSpace` | R channel |
-| `iridescenceThicknessMap` | `NoColorSpace` | R channel |
+| `iridescenceThicknessMap` | `NoColorSpace` | G channel, interpolates minimum to maximum thickness |
 | `sheenRoughnessMap` | `NoColorSpace` | R channel |
 | `anisotropyMap` | `NoColorSpace` | RG channels |
 | `specularIntensityMap` | `NoColorSpace` | A channel |
@@ -193,7 +194,7 @@ Extends `MeshStandardMaterial` with ALL its properties, plus:
 |--------|--------|--------|
 | `TextureLoader` | PNG, JPG, WebP | `three` core |
 | `CubeTextureLoader` | 6x PNG/JPG cube maps | `three` core |
-| `RGBELoader` | .hdr (Radiance HDR) | `three/addons/loaders/RGBELoader.js` |
+| `HDRLoader` | .hdr (Radiance HDR) | `three/addons/loaders/HDRLoader.js` |
 | `EXRLoader` | .exr (OpenEXR HDR) | `three/addons/loaders/EXRLoader.js` |
 | `KTX2Loader` | .ktx2 (GPU compressed) | `three/addons/loaders/KTX2Loader.js` |
 
@@ -281,6 +282,14 @@ For textures: set `texture.needsUpdate = true` after modifying `texture.image` d
 When using `MeshToonMaterial`, ALWAYS set `gradientMap.minFilter = NearestFilter` and `gradientMap.magFilter = NearestFilter`. Linear filtering blurs the discrete shading steps into smooth gradients, defeating the toon effect.
 
 ---
+
+## r187 Material Changes
+
+ALWAYS use `iridescenceThicknessMinimum` and `iridescenceThicknessMaximum` in
+new examples. The former range-array property is deprecated. PMREM now uses
+cubemap mip levels rather than a cube-UV atlas, so PBR reflections can differ
+visually from r186 without a material configuration error. NEVER import the
+removed CubeUVReflectionMapping constant or sample the old atlas layout.
 
 ## Reference Links
 

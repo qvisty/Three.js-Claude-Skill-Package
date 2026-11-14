@@ -56,3 +56,23 @@
 **Date:** 2026-03-20
 **Decision:** B2 research determines whether raycasting stays in core-scene-graph or becomes a separate skill.
 **Rationale:** Raycaster touches scene graph, controls, and physics. Research needed to determine if the API surface justifies a standalone skill.
+
+### D-012: Versioned r186 Baseline (supersedes D-002, D-003 and D-004 version assumptions)
+**Date:** 2026-11-14
+**Decision:** Target three@0.186.1, Fiber 9.8.2, Drei 10.7.9 and React 19.
+Use qvisty/threejs-skills as a migration cross-check, verified against published
+source. Retain atomic skills and their reference layout. Pin versions rather than
+promise r160+ compatibility; distinguish WebGPU renderer support from native-only
+features. r187 exists but is outside this tested baseline.
+**Rationale:** Removed and renamed APIs make the original unbounded baseline
+unreliable. Import/CPU tests plus documented browser scenes provide repeatable evidence.
+
+### D-013: Upgrade All Skills to r187 (supersedes D-012's release target)
+**Date:** 2026-11-14
+**Decision:** Pin three@0.187.0, the npm latest stable release verified today.
+Retain the compatible React/Fiber/Drei versions; validate their combination in a
+browser. Keep the sibling r186 reference unchanged and use the official r187
+migration guide plus published source for the release delta.
+**Rationale:** The user requested the newest Three.js release. Version labels,
+API contracts, tests and environment instructions must agree. A passed import
+check does not certify native WebGPU, XR hardware or external integrations.

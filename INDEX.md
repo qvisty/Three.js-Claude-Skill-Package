@@ -41,7 +41,7 @@
 | 14 | threejs-impl-physics | cannon-es and Rapier integration, rigid bodies, colliders, constraints, sync patterns, performance comparison. |
 | 15 | threejs-impl-react-three-fiber | R3F Canvas, useFrame, useThree, useLoader, JSX mapping, event system, extend(), performance patterns. |
 | 16 | threejs-impl-drei | 150+ Drei components: controls, environment, text, materials, loaders, staging, performance helpers. |
-| 17 | threejs-impl-webgpu | WebGPURenderer (EXPERIMENTAL), node materials, TSL, compute shaders, WebGL fallback, migration guide. |
+| 17 | threejs-impl-webgpu | WebGPURenderer (r187), node materials, TSL, compute shaders, WebGL fallback, migration guide. |
 | 18 | threejs-impl-ifc-viewer | web-ifc (MIT) and @thatopen/components (AGPL-3.0), IFC loading, spatial tree, property extraction. |
 | 19 | threejs-impl-audio | AudioListener, Audio, PositionalAudio, AudioAnalyser, distance models, browser autoplay policy. |
 | 20 | threejs-impl-xr | WebXR VR/AR, VRButton/ARButton, controllers, hand tracking, hit testing, teleportation. |

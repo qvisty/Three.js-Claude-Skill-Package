@@ -8,10 +8,10 @@ description: >
   with diagnosis steps and fix patterns.
   Keywords: black screen, invisible, wrong color, z-fighting, shadow artifact, rendering error, debug, nothing visible, dark, broken, nothing shows, model not appearing, screen is blank.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-errors-rendering
@@ -169,12 +169,12 @@ Object is at a position far from the camera, or `scale.set(0, 0, 0)`.
 
 ### Cause A: Color space mismatch
 
-This is the MOST COMMON color error in Three.js r160+.
+This is the MOST COMMON color error in Three.js r187.
 
 **Rules:**
 - Color/diffuse/emissive textures: ALWAYS set `texture.colorSpace = THREE.SRGBColorSpace`
 - Data textures (normal, roughness, metalness, AO, displacement): ALWAYS leave as `THREE.LinearSRGBColorSpace`
-- Renderer output: `renderer.outputColorSpace = THREE.SRGBColorSpace` (default in r160+)
+- Renderer output: `renderer.outputColorSpace = THREE.SRGBColorSpace` (default in r187)
 
 **Symptoms of wrong color space:**
 - Washed-out colors: data texture incorrectly set to `SRGBColorSpace` (double gamma)

@@ -142,7 +142,7 @@ new FlyControls(camera: THREE.Camera, domElement: HTMLElement)
 ```typescript
 update(delta: number): void
 ```
-Update camera position/rotation. **ALWAYS** pass `delta` from `clock.getDelta()`. NEVER omit this argument.
+Update camera position/rotation. **ALWAYS** pass `delta` from `timer.getDelta()`. NEVER omit this argument.
 
 ```typescript
 dispose(): void

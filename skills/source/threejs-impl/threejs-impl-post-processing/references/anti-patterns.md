@@ -129,7 +129,7 @@ function animate() {
 **WRONG:**
 ```js
 composer.addPass( new RenderPass( scene, camera ) );
-composer.addPass( new SMAAPass( width, height ) );      // AA FIRST
+composer.addPass( new SMAAPass() );      // AA FIRST
 composer.addPass( new UnrealBloomPass( res, 1.5, 0.4, 0.85 ) ); // Bloom AFTER AA
 composer.addPass( new OutputPass() );
 ```
@@ -140,7 +140,7 @@ composer.addPass( new OutputPass() );
 ```js
 composer.addPass( new RenderPass( scene, camera ) );
 composer.addPass( new UnrealBloomPass( res, 1.5, 0.4, 0.85 ) ); // Effects FIRST
-composer.addPass( new SMAAPass( width, height ) );                // AA AFTER effects
+composer.addPass( new SMAAPass() );                // AA AFTER effects
 composer.addPass( new OutputPass() );
 ```
 
@@ -195,22 +195,23 @@ const myShader = {
 
 **WRONG:**
 ```js
-import { WebGPURenderer } from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+import { WebGPURenderer } from 'three/webgpu';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 
 const renderer = new WebGPURenderer();
 const composer = new EffectComposer( renderer ); // INCOMPATIBLE
 ```
 
-**WHY:** The built-in `EffectComposer` is designed exclusively for `WebGLRenderer`. It uses WebGL-specific render targets, framebuffers, and shader compilation. The WebGPU renderer has its own node-based `PostProcessing` class that uses TSL (Three Shading Language).
+**WHY:** The built-in `EffectComposer` is designed exclusively for `WebGLRenderer`. It uses WebGL-specific render targets, framebuffers, and shader compilation. The WebGPU renderer has its own node-based `RenderPipeline` class that uses TSL (Three Shading Language).
 
 **CORRECT:**
 ```js
-import { WebGPURenderer } from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-import { PostProcessing } from 'three/addons/tsl/display/PostProcessing.js';
+import { WebGPURenderer } from 'three/webgpu';
+import { RenderPipeline } from 'three/webgpu';
 
 const renderer = new WebGPURenderer();
-const postProcessing = new PostProcessing( renderer );
+await renderer.init();
+const postProcessing = new RenderPipeline( renderer );
 ```
 
 ---

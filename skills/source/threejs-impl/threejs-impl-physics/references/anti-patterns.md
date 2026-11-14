@@ -17,9 +17,13 @@ function animate() {
 
 **Correct:**
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
+  timer.update();
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  const delta = timer.getDelta();
   world.step(1 / 60, delta, 3); // ALWAYS step the world
   mesh.position.copy(body.position);
   mesh.quaternion.copy(body.quaternion);
@@ -147,8 +151,12 @@ const collider = RAPIER.ColliderDesc.cuboid(width / 2, height / 2, depth / 2);
 
 **Wrong:**
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   world.step(delta); // WRONG — variable timestep causes non-deterministic simulation
 }
 ```
@@ -157,8 +165,12 @@ function animate() {
 
 **Correct (cannon-es):**
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   world.step(1 / 60, delta, 3); // fixed step with interpolation
 }
 ```

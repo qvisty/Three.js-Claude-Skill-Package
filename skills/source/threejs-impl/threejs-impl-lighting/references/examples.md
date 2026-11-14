@@ -1,6 +1,6 @@
 # threejs-impl-lighting — Examples Reference
 
-> Lighting recipes for common scenarios. All examples use ES module imports and Three.js r160+.
+> Lighting recipes for common scenarios. All examples use ES module imports and Three.js r187.
 
 ---
 
@@ -10,7 +10,7 @@ Simulates natural daylight with a sun, sky hemisphere, and HDR environment.
 
 ```javascript
 import * as THREE from 'three';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 // Renderer with tone mapping for physically correct values
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -31,7 +31,7 @@ scene.add(sun.target); // REQUIRED — target defaults to (0,0,0)
 
 // 3. HDR environment for reflections on PBR materials
 const pmrem = new THREE.PMREMGenerator(renderer);
-new RGBELoader().load('outdoor_field.hdr', (hdrTexture) => {
+new HDRLoader().load('outdoor_field.hdr', (hdrTexture) => {
   const envMap = pmrem.fromEquirectangular(hdrTexture);
   scene.environment = envMap.texture;
   scene.background = envMap.texture;
@@ -103,7 +103,7 @@ Three-point lighting setup for showcasing 3D models.
 
 ```javascript
 import * as THREE from 'three';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -132,7 +132,7 @@ scene.add(rimLight.target);
 
 // 4. Environment map for PBR reflections (studio HDRI)
 const pmrem = new THREE.PMREMGenerator(renderer);
-new RGBELoader().load('studio_small.hdr', (hdrTexture) => {
+new HDRLoader().load('studio_small.hdr', (hdrTexture) => {
   const envMap = pmrem.fromEquirectangular(hdrTexture);
   scene.environment = envMap.texture;
   scene.environmentIntensity = 0.5; // Subtle IBL, let directional lights dominate
@@ -208,7 +208,7 @@ The simplest high-quality lighting: HDR environment map only, no analytic lights
 
 ```javascript
 import * as THREE from 'three';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -219,7 +219,7 @@ const scene = new THREE.Scene();
 const pmrem = new THREE.PMREMGenerator(renderer);
 pmrem.compileEquirectangularShader(); // Pre-compile for faster first use
 
-new RGBELoader()
+new HDRLoader()
   .setDataType(THREE.HalfFloatType) // Better precision for HDR
   .load('environment.hdr', (hdrTexture) => {
     const envMap = pmrem.fromEquirectangular(hdrTexture);

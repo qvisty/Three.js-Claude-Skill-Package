@@ -1,6 +1,6 @@
 # threejs-impl-audio — Method Reference
 
-> Complete API signatures for Three.js audio classes (r160+).
+> Complete API signatures for Three.js audio classes (r187).
 
 ---
 

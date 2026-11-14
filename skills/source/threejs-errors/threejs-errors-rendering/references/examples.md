@@ -46,7 +46,7 @@ animate();
 import * as THREE from 'three';
 
 const renderer = new THREE.WebGLRenderer();
-renderer.outputColorSpace = THREE.SRGBColorSpace; // default in r160+
+renderer.outputColorSpace = THREE.SRGBColorSpace; // default in r187
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 

@@ -1,252 +1,85 @@
-# Working Code Examples (Three.js WebGPU)
+# r187 WebGPU Examples
 
-## Example 1: Minimal WebGPU Scene with Fallback
+## Complete scene with automatic fallback and bloom
+
+Install `three@0.187.0` and serve this ES module through a bundler or an import
+map mapping `three`, `three/webgpu`, `three/tsl`, and `three/addons/` to the same release.
 
 ```javascript
 import * as THREE from 'three/webgpu';
-import { WebGPU } from 'three/webgpu';
+import { pass, color, mix, oscSine, time } from 'three/tsl';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
-async function init() {
-  let renderer;
+const renderer = new THREE.WebGPURenderer({ antialias: true });
+await renderer.init();
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.appendChild(renderer.domElement);
 
-  if (WebGPU.isAvailable()) {
-    renderer = new THREE.WebGPURenderer({ antialias: true });
-    await renderer.init();
-  } else {
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-  }
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111318);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.z = 4;
+const material = new THREE.MeshStandardNodeMaterial({ emissive: 0xff6600, emissiveIntensity: 2 });
+material.colorNode = mix(color(0xff6600), color(0x3366ff), oscSine(time));
+const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 16), material);
+scene.add(mesh, new THREE.AmbientLight(0xffffff, 1));
 
+const pipeline = new THREE.RenderPipeline(renderer);
+const sceneColor = pass(scene, camera).getTextureNode('output');
+pipeline.outputNode = sceneColor.add(bloom(sceneColor, 1.5, 0.4, 0.6));
+const timer = new THREE.Timer();
+timer.connect(document);
+renderer.setAnimationLoop(() => {
+  timer.update();
+  mesh.rotation.y += timer.getDelta();
+  pipeline.render();
+});
+
+function resize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  document.body.appendChild(renderer.domElement);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(
-    75, window.innerWidth / window.innerHeight, 0.1, 1000
-  );
-  camera.position.z = 5;
-
-  const geometry = new THREE.BoxGeometry();
-  const material = new THREE.MeshStandardNodeMaterial({ color: 0x00ff00 });
-  const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
-
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(5, 5, 5);
-  scene.add(light);
-
-  renderer.setAnimationLoop((time) => {
-    cube.rotation.x = time * 0.001;
-    cube.rotation.y = time * 0.0015;
-    renderer.render(scene, camera);
-  });
 }
+window.addEventListener('resize', resize);
 
-init();
+function dispose() {
+  renderer.setAnimationLoop(null);
+  window.removeEventListener('resize', resize);
+  timer.dispose();
+  pipeline.dispose();
+  mesh.geometry.dispose();
+  material.dispose();
+  mesh.dispose();
+  renderer.dispose();
+  renderer.domElement.remove();
+}
+// Call dispose() when the view unmounts.
 ```
 
----
+## Native compute with an explicit fallback boundary
 
-## Example 2: TSL Custom Material with Animated Color
-
-```javascript
-import * as THREE from 'three/webgpu';
-import { color, oscSine, time, mix, vec4 } from 'three/tsl';
-
-async function init() {
-  const renderer = new THREE.WebGPURenderer({ antialias: true });
-  await renderer.init();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.z = 3;
-
-  // Create node material with animated color
-  const material = new THREE.MeshStandardNodeMaterial();
-  const colorA = color(0xff0000); // red
-  const colorB = color(0x0000ff); // blue
-  const t = oscSine(time);        // oscillate 0-1 over time
-  material.colorNode = vec4(mix(colorA, colorB, t), 1.0);
-
-  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), material);
-  scene.add(sphere);
-
-  const light = new THREE.DirectionalLight(0xffffff, 2);
-  light.position.set(3, 3, 3);
-  scene.add(light);
-  scene.add(new THREE.AmbientLight(0x404040));
-
-  renderer.setAnimationLoop(() => {
-    renderer.render(scene, camera);
-  });
-}
-
-init();
-```
-
----
-
-## Example 3: Vertex Displacement with TSL
+The renderer below is already initialized. This snippet produces a buffer for
+subsequent GPU work; it does not itself display particles.
 
 ```javascript
-import * as THREE from 'three/webgpu';
-import { positionLocal, normalLocal, sin, time, float, vec3 } from 'three/tsl';
+import { StorageBufferAttribute } from 'three/webgpu';
+import { Fn, storage, instanceIndex, vec3 } from 'three/tsl';
 
-async function init() {
-  const renderer = new THREE.WebGPURenderer({ antialias: true });
-  await renderer.init();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+const count = 1024;
+const attribute = new StorageBufferAttribute(count, 3);
+const positions = storage(attribute, 'vec3', count);
+const initialize = Fn(() => {
+  positions.element(instanceIndex).assign(vec3(0, 1, 0));
+})().compute(count);
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.z = 4;
-
-  const material = new THREE.MeshStandardNodeMaterial({ color: 0x44aaff });
-
-  // Displace vertices along their normals using a sine wave
-  const displacement = sin(
-    positionLocal.y.mul(float(4.0)).add(time.mul(float(2.0)))
-  ).mul(float(0.3));
-
-  material.positionNode = positionLocal.add(normalLocal.mul(displacement));
-
-  const geometry = new THREE.SphereGeometry(1, 64, 64);
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
-
-  const light = new THREE.DirectionalLight(0xffffff, 2);
-  light.position.set(5, 5, 5);
-  scene.add(light);
-  scene.add(new THREE.AmbientLight(0x222222));
-
-  renderer.setAnimationLoop(() => {
-    renderer.render(scene, camera);
-  });
+if (renderer.backend.isWebGPUBackend) {
+  renderer.compute(initialize);
+  const result = await renderer.getArrayBufferAsync(attribute);
+  console.log(new Float32Array(result));
+} else {
+  // Select a CPU implementation or disable the compute-dependent feature.
+  console.log('Native WebGPU compute is unavailable');
 }
-
-init();
-```
-
----
-
-## Example 4: Compute Shader — Particle Position Update
-
-```javascript
-import * as THREE from 'three/webgpu';
-import {
-  compute, storage, float, vec3, Fn,
-  globalId, sin, cos, time
-} from 'three/tsl';
-
-async function init() {
-  const renderer = new THREE.WebGPURenderer({ antialias: true });
-  await renderer.init();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 50;
-
-  const particleCount = 10000;
-
-  // Create storage buffer for positions
-  const positionAttribute = new THREE.StorageBufferAttribute(
-    new Float32Array(particleCount * 3), 3
-  );
-
-  // Initialize positions
-  for (let i = 0; i < particleCount; i++) {
-    positionAttribute.setXYZ(i,
-      (Math.random() - 0.5) * 40,
-      (Math.random() - 0.5) * 40,
-      (Math.random() - 0.5) * 40
-    );
-  }
-
-  // Compute shader: update positions with circular motion
-  const positionStorage = storage(positionAttribute, 'vec3', particleCount);
-  const computeFn = Fn(() => {
-    const idx = globalId.x;
-    const pos = positionStorage.element(idx);
-    const angle = time.add(float(idx).mul(float(0.01)));
-    pos.x.assign(sin(angle).mul(float(20.0)));
-    pos.z.assign(cos(angle).mul(float(20.0)));
-  });
-
-  const computeNode = compute(computeFn, particleCount);
-
-  // Create points geometry
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', positionAttribute);
-
-  const material = new THREE.PointsNodeMaterial({
-    size: 0.2,
-    sizeAttenuation: true,
-    color: 0x00ffaa,
-  });
-
-  const points = new THREE.Points(geometry, material);
-  scene.add(points);
-
-  renderer.setAnimationLoop(async () => {
-    await renderer.computeAsync(computeNode);
-    renderer.render(scene, camera);
-  });
-}
-
-init();
-```
-
----
-
-## Example 5: WebGPU Post-Processing with Bloom
-
-```javascript
-import * as THREE from 'three/webgpu';
-import { PostProcessing } from 'three/webgpu';
-import { pass, bloom, renderOutput } from 'three/tsl';
-
-async function init() {
-  const renderer = new THREE.WebGPURenderer({ antialias: true });
-  await renderer.init();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  document.body.appendChild(renderer.domElement);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.z = 5;
-
-  // Emissive sphere for bloom effect
-  const material = new THREE.MeshStandardNodeMaterial({
-    color: 0x000000,
-    emissive: 0xff6600,
-    emissiveIntensity: 2,
-  });
-
-  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), material);
-  scene.add(sphere);
-  scene.add(new THREE.AmbientLight(0x111111));
-
-  // Set up post-processing pipeline
-  const postProcessing = new PostProcessing(renderer);
-  const scenePass = pass(scene, camera);
-  const bloomPass = bloom(scenePass, {
-    strength: 1.5,
-    radius: 0.4,
-    threshold: 0.6,
-  });
-  postProcessing.outputNode = renderOutput(bloomPass);
-
-  renderer.setAnimationLoop((time) => {
-    sphere.rotation.y = time * 0.001;
-    postProcessing.render();
-  });
-}
-
-init();
 ```

@@ -1,6 +1,6 @@
 # methods.md -- React Three Fiber API Reference
 
-> Complete hook signatures and Canvas API for @react-three/fiber 8.x+.
+> Complete hook signatures and Canvas API for @react-three/fiber 9.8.2.
 
 ---
 

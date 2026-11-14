@@ -1,4 +1,4 @@
-# API Signatures Reference (Three.js Geometries r160+)
+# API Signatures Reference (Three.js Geometries r187)
 
 ## BufferGeometry
 
@@ -349,7 +349,7 @@ new CylinderGeometry(radiusTop?: number, radiusBottom?: number, height?: number,
 new ConeGeometry(radius?: number, height?: number, radialSegments?: number,
                  heightSegments?: number, openEnded?: boolean, thetaStart?: number, thetaLength?: number)
 
-new CapsuleGeometry(radius?: number, length?: number, capSegments?: number, radialSegments?: number)
+new CapsuleGeometry(radius?: number, height?: number, capSegments?: number, radialSegments?: number, heightSegments?: number)
 
 new TorusGeometry(radius?: number, tube?: number, radialSegments?: number,
                   tubularSegments?: number, arc?: number)

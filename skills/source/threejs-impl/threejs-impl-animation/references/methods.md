@@ -1,6 +1,6 @@
 # threejs-impl-animation — Method Reference
 
-> Complete API signatures for the Three.js Animation System (r160+).
+> Complete API signatures for the Three.js Animation System (r187).
 
 ---
 
@@ -37,7 +37,7 @@ mixer.existingAction(
 // Returns a previously created action or null.
 
 mixer.update(deltaTimeInSeconds: number): AnimationMixer
-// Advances the mixer. MUST call every frame with clock.getDelta().
+// Advances the mixer. MUST call every frame with timer.getDelta().
 
 mixer.setTime(timeInSeconds: number): AnimationMixer
 // Sets the global mixer time and forces an update of all active actions.
@@ -304,33 +304,24 @@ track.validate(): boolean
 
 ---
 
-## Clock
-
-### Constructor
+## Timer (Three.js r187)
 
 ```ts
-new Clock(autoStart?: boolean): Clock
-// autoStart defaults to true.
+new Timer(): Timer
+timer.connect(document: Document): void
+timer.disconnect(): void
+timer.update(timestamp?: number): Timer
+timer.getDelta(): number       // seconds from the most recent update
+timer.getElapsed(): number     // accumulated seconds
+timer.getTimescale(): number
+timer.setTimescale(timescale: number): Timer
+timer.reset(): Timer
+timer.dispose(): void
 ```
 
-### Properties
-
-```ts
-clock.autoStart: boolean
-clock.elapsedTime: number     // total accumulated time in seconds
-clock.oldTime: number         // last method call timestamp
-clock.running: boolean        // default: true
-clock.startTime: number       // when start() was last called
-```
-
-### Methods
-
-```ts
-clock.getDelta(): number        // seconds since last getDelta() call
-clock.getElapsedTime(): number  // total elapsed time in seconds
-clock.start(): void             // starts the clock
-clock.stop(): void              // halts without resetting
-```
+ALWAYS call update once per frame before reading elapsed time or delta. Repeated
+getDelta reads return the same value. connect(document) handles page visibility.
+Clock is deprecated; R3F still owns a Clock internally in the pinned R3F release.
 
 ---
 

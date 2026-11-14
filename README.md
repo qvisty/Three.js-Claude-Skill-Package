@@ -7,24 +7,66 @@
 > 24 deterministic skills for Three.js 3D web development with Claude Code.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Three.js](https://img.shields.io/badge/Three.js-r160+-black.svg)](https://threejs.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-r187-black.svg)](https://threejs.org/)
 [![Skills](https://img.shields.io/badge/Skills-24-blue.svg)]()
 
-A comprehensive skill package that gives Claude deep knowledge of Three.js r160+, React Three Fiber, Drei, WebGPU, physics engines, and more. Every skill uses deterministic ALWAYS/NEVER language for consistent, reliable code generation.
+A comprehensive skill package that gives Claude deep knowledge of Three.js r187 (`three@0.187.0`), React Three Fiber, Drei, WebGPU, physics engines, and more. Every skill uses deterministic ALWAYS/NEVER language for consistent, reliable code generation.
 
-## Installation
+## Validated release baseline
 
-Add this repository as a skill source in your Claude Code project:
+This revision targets **Three.js r187 (`three@0.187.0`)**, with React 19,
+`@react-three/fiber@9.8.2` and `@react-three/drei@10.7.9`. It no longer promises
+compatibility with every release from r160 onward. npm confirmed `0.187.0` as
+the latest stable Three.js version on 2026-11-14.
+
+The original r186 migration used `qvisty/threejs-skills` as a topic cross-check.
+The r187 update follows the official migration guide and published r187 source;
+the reference repository still targets r186. See the
+[migration and validation report](docs/validation/r187-migration.md) for changes,
+source revisions, coverage and remaining runtime limits. Historical research
+documents retain their original version assumptions.
+
+For maintainers:
 
 ```bash
-# Clone the repository
-git clone https://github.com/OpenAEC-Foundation/Three.js-Claude-Skill-Package.git
-
-# Or add as a git submodule
-git submodule add https://github.com/OpenAEC-Foundation/Three.js-Claude-Skill-Package.git .claude/skills/threejs
+npm ci
+npm test
+npm run test:browser # requires Chromium; default /usr/bin/chromium
 ```
 
-Then reference the skills directory in your Claude Code configuration.
+Set `CHROMIUM_PATH` if Chromium is installed elsewhere. These dependencies are
+for validation; consuming the Markdown skills does not require an npm install.
+The browser check executes documented WebGL, WebGPURenderer fallback and React Three Fiber scenes.
+It also checks r187 render-target coordinates, PMREM cubemaps and a PBR material.
+To save rendered-frame images and JSON results outside the checkout:
+
+```bash
+npm run test:browser -- --artifacts /workspace/threejs-test-results/r187
+npm run test:browser -- --case webgl --artifacts /workspace/threejs-test-results/renderer
+```
+
+The images are captured immediately after rendering, including after resize.
+All 24 skills target r187; this does not certify every integration or code fragment.
+
+## Installation in Claude Code
+
+See the [Danish installation and usage guide](docs/CLAUDE-CODE-DA.md) for macOS,
+Linux/WSL and Windows PowerShell commands, verification, direct skill invocation,
+and updates. A [copy-ready Danish starter prompt](docs/CLAUDE-CODE-PROMPT-DA.md)
+is included.
+
+Clone this maintained fork, then copy the 24 individual directories from
+`skills/source/*/*` into your app project's `.claude/skills/`, keeping each
+`SKILL.md` with its `references/` directory:
+
+```bash
+git clone https://github.com/qvisty/Three.js-Claude-Skill-Package.git
+```
+
+Start Claude Code in your app project. It can select relevant skills from your
+request; invoke `/threejs-core-renderer` directly to check discovery. Copy only
+the skill directories; this repository's CLAUDE.md is for maintaining the package.
+Installing the Markdown skills does not install application dependencies.
 
 ## Skills Overview
 
@@ -32,7 +74,7 @@ Then reference the skills directory in your Claude Code configuration.
 |----------|-------|--------|
 | **Core** | 4 | Scene Graph, Renderer, Math, Raycaster |
 | **Syntax** | 5 | Geometries, Materials, Shaders, Loaders, Controls |
-| **Implementation** | 10 | Lighting, Shadows, Animation, Post-Processing, Physics, R3F, Drei, WebGPU, IFC, Audio, XR |
+| **Implementation** | 11 | Lighting, Shadows, Animation, Post-Processing, Physics, R3F, Drei, WebGPU, IFC, Audio, XR |
 | **Errors** | 2 | Performance, Rendering |
 | **Agents** | 2 | Scene Builder, Model Optimizer |
 
@@ -84,17 +126,17 @@ Every skill in this package meets strict quality requirements:
 - **English only** — Claude reads English, responds in any language
 - **Complete references** — methods.md, examples.md, anti-patterns.md per skill
 - **ES module imports** — Modern `import { X } from 'three'` syntax
-- **Version-explicit** — Three.js r160+, React Three Fiber 8.x
+- **Version-explicit** — Three.js r187 (`three@0.187.0`), React Three Fiber 9.8.2 / React 19
 - **Self-contained** — Each skill works independently
 
 ## Technology Coverage
 
 | Technology | Version | Skills |
 |------------|---------|--------|
-| Three.js | r160+ | All 24 skills |
-| React Three Fiber | 8.x+ | impl-react-three-fiber, impl-drei |
-| Drei | Latest | impl-drei |
-| WebGPU Renderer | Experimental | impl-webgpu |
+| Three.js | r187 (`three@0.187.0`) | All 24 skills |
+| React Three Fiber | 9.8.2 | impl-react-three-fiber, impl-drei |
+| Drei | 10.7.9 | impl-drei |
+| WebGPU Renderer | r187, automatic WebGL 2 fallback | impl-webgpu |
 | cannon-es | 0.20+ | impl-physics |
 | Rapier | 0.12+ | impl-physics |
 | @thatopen/components | v3.x | impl-ifc-viewer |
@@ -107,7 +149,7 @@ Three.js-Claude-Skill-Package/
 ├── skills/source/
 │   ├── threejs-core/          (4 skills)
 │   ├── threejs-syntax/        (5 skills)
-│   ├── threejs-impl/          (10 skills)
+│   ├── threejs-impl/          (11 skills)
 │   ├── threejs-errors/        (2 skills)
 │   └── threejs-agents/        (2 skills)
 ├── docs/

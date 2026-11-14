@@ -33,7 +33,7 @@ renderer.getPixelRatio(): number
 
 ```typescript
 renderer.outputColorSpace: string
-// Default: THREE.SRGBColorSpace (r160+)
+// Default: THREE.SRGBColorSpace (r187)
 // Set to THREE.LinearSRGBColorSpace for post-processing pipelines
 
 renderer.toneMapping: number

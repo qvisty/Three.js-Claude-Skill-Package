@@ -1,4 +1,4 @@
-# Working Code Examples (Three.js r160+ Materials)
+# Working Code Examples (Three.js r187 Materials)
 
 ## Example 1: PBR Material with Texture Maps
 
@@ -42,9 +42,9 @@ const material = new THREE.MeshStandardMaterial({
   aoMapIntensity: 1.0
 });
 
-// Geometry MUST have uv2 attribute for aoMap
+// AO uses uv by default; set aoMap.channel = 1 only for a separate uv1 unwrap.
 const geometry = new THREE.BoxGeometry(2, 2, 2);
-geometry.setAttribute('uv2', geometry.getAttribute('uv'));
+// No duplicate UV attribute is needed when AO shares the base UVs.
 
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
@@ -90,14 +90,14 @@ Load an HDR environment map and use it for both lighting and reflections.
 
 ```javascript
 import * as THREE from 'three';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 
-const rgbeLoader = new RGBELoader();
-rgbeLoader.load('environment.hdr', (texture) => {
+const hdrLoader = new HDRLoader();
+hdrLoader.load('environment.hdr', (texture) => {
   texture.mapping = THREE.EquirectangularReflectionMapping;
   scene.environment = texture;   // PBR environment lighting for ALL materials
   scene.background = texture;    // Optional: visible HDR background

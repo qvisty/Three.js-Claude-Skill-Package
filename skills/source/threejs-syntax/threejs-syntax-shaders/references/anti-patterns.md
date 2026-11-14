@@ -246,7 +246,7 @@ material.onBeforeCompile = (shader) => {
 };
 
 // In animation loop -- crashes if shader has not compiled yet
-material.userData.shader.uniforms.uTime.value = clock.getElapsedTime();
+material.userData.shader.uniforms.uTime.value = timer.getElapsed();
 ```
 
 **CORRECT:**
@@ -258,7 +258,7 @@ material.onBeforeCompile = (shader) => {
 
 // In animation loop -- ALWAYS check existence
 if (material.userData.shader) {
-  material.userData.shader.uniforms.uTime.value = clock.getElapsedTime();
+  material.userData.shader.uniforms.uTime.value = timer.getElapsed();
 }
 ```
 

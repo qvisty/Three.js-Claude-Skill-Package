@@ -4,14 +4,14 @@ description: >
   Use when loading 3D models (GLTF, FBX, OBJ), textures, or HDR
   environment maps in Three.js. Prevents the common mistake of not
   setting up DRACOLoader, wrong WASM path, or missing error handling.
-  Covers GLTFLoader, DRACOLoader, KTX2Loader, TextureLoader, RGBELoader,
+  Covers GLTFLoader, DRACOLoader, KTX2Loader, TextureLoader, HDRLoader,
   FBXLoader, OBJLoader, LoadingManager.
-  Keywords: GLTFLoader, GLTF, GLB, load model, DRACOLoader, texture, FBXLoader, OBJLoader, RGBELoader, HDR, LoadingManager, progress, export, GLTFExporter, save model, download 3D, import 3D file.
+  Keywords: GLTFLoader, GLTF, GLB, load model, DRACOLoader, texture, FBXLoader, OBJLoader, HDRLoader, HDR, LoadingManager, progress, export, GLTFExporter, save model, download 3D, import 3D file.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-syntax-loaders
@@ -42,7 +42,7 @@ const result = await loader.loadAsync(url, onProgress);
 | `FBXLoader` | `import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';` |
 | `OBJLoader` | `import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';` |
 | `MTLLoader` | `import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';` |
-| `RGBELoader` | `import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';` |
+| `HDRLoader` | `import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';` |
 | `MeshoptDecoder` | `import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';` |
 
 ### Format Recommendation
@@ -53,7 +53,7 @@ const result = await loader.loadAsync(url, onProgress);
 
 **NEVER** call `loader.load()` inside `requestAnimationFrame` or any render loop. Load assets once at initialization and cache the result.
 
-**NEVER** forget to set the DRACOLoader decoder path before loading Draco-compressed models. The path MUST point to a directory containing `draco_decoder.wasm`.
+**ALWAYS** attach a DRACOLoader for Draco-compressed models. In r187 its decoder path defaults to bundled WASM assets; override it ONLY for a deliberate self-hosting setup using matching assets.
 
 **NEVER** skip error handling on `loadAsync` calls. ALWAYS wrap in try/catch. Failed loads without error handlers crash silently.
 
@@ -131,7 +131,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+// r187 resolves its bundled Draco WASM decoder by default.
 
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
@@ -246,22 +246,22 @@ scene.environment = cubeTexture;
 
 ---
 
-## RGBELoader
+## HDRLoader
 
 Loads HDR environment maps in Radiance `.hdr` format.
 
 ```javascript
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
-const rgbeLoader = new RGBELoader();
-rgbeLoader.load('environment.hdr', (texture) => {
+const hdrLoader = new HDRLoader();
+hdrLoader.load('environment.hdr', (texture) => {
   texture.mapping = THREE.EquirectangularReflectionMapping;
   scene.environment = texture; // PBR environment lighting
   scene.background = texture;  // Optional: visible HDR background
 });
 ```
 
-The RGBELoader sets color space automatically. NEVER manually override the color space on HDR textures.
+The HDRLoader sets color space automatically. NEVER manually override the color space on HDR textures.
 
 ---
 
@@ -351,4 +351,4 @@ function disposeMaterial(material) {
 - https://threejs.org/docs/#examples/en/loaders/KTX2Loader
 - https://threejs.org/docs/#examples/en/loaders/FBXLoader
 - https://threejs.org/docs/#examples/en/loaders/OBJLoader
-- https://threejs.org/docs/#examples/en/loaders/RGBELoader
+- https://threejs.org/docs/#examples/en/loaders/HDRLoader

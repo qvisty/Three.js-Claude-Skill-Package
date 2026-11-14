@@ -8,10 +8,10 @@ description: >
   patterns, performance comparison.
   Keywords: physics, cannon-es, Rapier, rigid body, collider, collision, gravity, simulation, WASM, constraint, joint, objects fall, collision detection, bouncing, realistic movement.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-physics
@@ -151,12 +151,16 @@ body.addEventListener('wakeup', () => { /* body woke up */ });
 ### Stepping
 
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 // ALWAYS use three-argument step for deterministic simulation
 const fixedTimeStep = 1 / 60;
 const maxSubSteps = 3;
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   world.step(fixedTimeStep, delta, maxSubSteps);
 }
 ```

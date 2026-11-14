@@ -24,12 +24,14 @@ renderer.setAnimationLoop(animate);
 **CORRECT:**
 
 ```js
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 const mixer = new THREE.AnimationMixer(model);
 mixer.clipAction(clip).play();
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   mixer.update(delta); // ALWAYS call every frame
   renderer.render(scene, camera);
 }
@@ -38,7 +40,7 @@ renderer.setAnimationLoop(animate);
 
 ---
 
-## Anti-Pattern 2: Using a Fixed Delta Instead of Clock
+## Anti-Pattern 2: Using a Fixed Delta Instead of Timer
 
 **WRONG:**
 
@@ -54,10 +56,12 @@ function animate() {
 **CORRECT:**
 
 ```js
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 
 function animate() {
-  const delta = clock.getDelta(); // Actual time between frames
+  timer.update();
+  const delta = timer.getDelta(); // Actual time between frames
   mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -123,10 +127,14 @@ action.play();
 **WRONG:**
 
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
+  timer.update();
   const mixer = new THREE.AnimationMixer(model); // New mixer every frame!
   mixer.clipAction(clip).play();
-  mixer.update(clock.getDelta());
+  mixer.update(timer.getDelta());
   renderer.render(scene, camera);
 }
 ```
@@ -136,12 +144,16 @@ function animate() {
 **CORRECT:**
 
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 const mixer = new THREE.AnimationMixer(model); // Create ONCE
 const action = mixer.clipAction(clip);
 action.play();
 
 function animate() {
-  mixer.update(clock.getDelta());
+  timer.update();
+  mixer.update(timer.getDelta());
   renderer.render(scene, camera);
 }
 ```
@@ -153,11 +165,15 @@ function animate() {
 **WRONG:**
 
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 const action = mixer.clipAction(clip);
 
 function animate() {
+  timer.update();
   action.play(); // Called every frame -- unnecessary
-  mixer.update(clock.getDelta());
+  mixer.update(timer.getDelta());
   renderer.render(scene, camera);
 }
 ```
@@ -167,11 +183,15 @@ function animate() {
 **CORRECT:**
 
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 const action = mixer.clipAction(clip);
 action.play(); // Call ONCE
 
 function animate() {
-  mixer.update(clock.getDelta());
+  timer.update();
+  mixer.update(timer.getDelta());
   renderer.render(scene, camera);
 }
 ```
@@ -271,27 +291,23 @@ const track = new THREE.NumberKeyframeTrack(
 
 ---
 
-## Anti-Pattern 11: Using getDelta() Multiple Times per Frame
+## Anti-Pattern: Updating Timer More Than Once per Frame
 
-**WRONG:**
-
-```js
-function animate() {
-  mixer1.update(clock.getDelta()); // Returns actual delta
-  mixer2.update(clock.getDelta()); // Returns ~0 (called immediately after)
-  renderer.render(scene, camera);
-}
-```
-
-**WHY:** `clock.getDelta()` returns the time since the LAST call to `getDelta()`. The second call within the same frame returns approximately zero, effectively freezing the second mixer.
+**WRONG:** Call `timer.update()` separately before each animation mixer. The second update measures only the time since the first update.
 
 **CORRECT:**
-
 ```js
+// Shared standalone frame timer (create once, dispose on teardown).
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
-  const delta = clock.getDelta(); // Call ONCE per frame
+  timer.update();
+  const delta = timer.getDelta();
   mixer1.update(delta);
-  mixer2.update(delta); // Same delta for both
+  mixer2.update(delta);
   renderer.render(scene, camera);
 }
+renderer.setAnimationLoop(animate);
 ```
+
+`Timer.getDelta()` is a stable read. It does not advance time like the deprecated `Clock.getDelta()`.

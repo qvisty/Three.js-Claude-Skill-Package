@@ -6,12 +6,12 @@ description: >
   common mistake of wrong shadow camera frustum, too many PointLight
   shadows, or missing castShadow/receiveShadow flags. Covers shadow map
   types, per-light config, bias tuning, CameraHelper debugging.
-  Keywords: shadows, shadowMap, shadow acne, peter panning, bias, normalBias, castShadow, receiveShadow, PCFSoftShadowMap, shadow camera, shadows not showing, shadow artifacts, enable shadows.
+  Keywords: shadows, shadowMap, shadow acne, peter panning, bias, normalBias, castShadow, receiveShadow, PCFShadowMap, shadow camera, shadows not showing, shadow artifacts, enable shadows.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-shadows
@@ -27,7 +27,7 @@ import * as THREE from 'three';
 
 // Step 1: Enable shadow maps on the renderer
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 // Step 2: Enable shadow casting on the light
 light.castShadow = true;
@@ -39,16 +39,15 @@ ground.receiveShadow = true;  // this mesh receives shadows
 
 ### Shadow Map Types
 
-| Type | Constant | Quality | Cost | Supports `.radius` |
-|------|----------|---------|------|---------------------|
-| Basic | `THREE.BasicShadowMap` | Hard edges, aliased | Lowest | No |
-| PCF | `THREE.PCFShadowMap` | Slightly softened | Moderate | No |
-| PCF Soft | `THREE.PCFSoftShadowMap` | Soft penumbra | Higher | No (ignores it) |
-| VSM | `THREE.VSMShadowMap` | Gaussian blur | Moderate | Yes |
+| Type | Constant | Behavior |
+|------|----------|----------|
+| Basic | `THREE.BasicShadowMap` | Unfiltered hard edges |
+| PCF | `THREE.PCFShadowMap` | Default soft filtering in r187 |
+| VSM | `THREE.VSMShadowMap` | WebGL variance filtering; can bleed light |
 
-- **Default** in r160+: `THREE.PCFShadowMap`
-- **PCFSoftShadowMap**: best general-purpose choice; IGNORES the `shadow.radius` property
-- **VSMShadowMap**: supports `shadow.radius` and `shadow.blurSamples` but can exhibit light bleeding on thin geometry
+PCFSoftShadowMap was deprecated in r182 and falls back to PCFShadowMap with a
+warning. ALWAYS choose PCFShadowMap for new soft-shadow examples. WebGPU supports
+Basic and PCF; NEVER assume WebGL VSM settings apply to WebGPURenderer.
 
 ### Critical Warnings
 
@@ -70,13 +69,11 @@ ground.receiveShadow = true;  // this mesh receives shadows
 
 No filtering applied. Produces hard, aliased shadow edges. Use ONLY for debugging or stylized rendering where hard shadows are intentional.
 
-### PCFShadowMap (Default)
+### PCFShadowMap (Default in r187)
 
-Percentage-Closer Filtering with a fixed-size kernel. Produces slightly softened edges. Good balance of quality and performance. The `shadow.radius` property has NO effect.
-
-### PCFSoftShadowMap
-
-Uses a variable kernel for softer penumbra simulation. Higher quality than PCF but more expensive. The `shadow.radius` property is IGNORED -- softness is determined automatically by the filter.
+Percentage-Closer Filtering produces soft shadows. On WebGLRenderer,
+`light.shadow.radius` controls the PCF sample spread. NEVER describe PCF as
+ignoring radius. Keep resolution and shadow camera bounds tight before tuning softness.
 
 ### VSMShadowMap
 
@@ -203,7 +200,7 @@ Shadow edges shimmer when camera moves? (Shadow Swimming)
 └── Use Cascaded Shadow Maps (CSM) for large scenes
 
 Light leaks through thin geometry? (Light Bleeding -- VSM only)
-├── Switch from VSMShadowMap to PCFSoftShadowMap
+├── Switch from VSMShadowMap to PCFShadowMap
 ├── Increase geometry thickness
 └── Reduce shadow.radius value
 

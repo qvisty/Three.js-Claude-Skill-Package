@@ -1,6 +1,6 @@
 # threejs-impl-animation — Examples
 
-> Working code examples for the Three.js Animation System (r160+).
+> Working code examples for the Three.js Animation System (r187).
 
 ---
 
@@ -20,7 +20,8 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 let mixer;
 
 const loader = new GLTFLoader();
@@ -36,7 +37,8 @@ loader.load('character.glb', (gltf) => {
 });
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -53,7 +55,8 @@ Select and play a specific animation by name from the GLTF file.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 let mixer;
 
 const loader = new GLTFLoader();
@@ -71,7 +74,8 @@ loader.load('character.glb', (gltf) => {
 });
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -88,7 +92,8 @@ Smooth transitions between idle, walk, and run states using crossfade.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 let mixer;
 const actions = {};
 let currentAction;
@@ -134,7 +139,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -151,7 +157,8 @@ Layer an additive animation (e.g., breathing or damage reaction) on top of a bas
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 let mixer;
 
 const loader = new GLTFLoader();
@@ -177,7 +184,8 @@ loader.load('character.glb', (gltf) => {
 });
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -194,7 +202,8 @@ Play an animation exactly once, clamp at the last frame, and detect completion.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 let mixer;
 
 const loader = new GLTFLoader();
@@ -219,7 +228,8 @@ loader.load('door.glb', (gltf) => {
 });
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -235,7 +245,8 @@ Create an animation entirely in code without loading a GLTF file.
 ```js
 import * as THREE from 'three';
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 
 // Create a simple cube
 const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -283,7 +294,8 @@ action.play();
 material.transparent = true;
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   mixer.update(delta);
   renderer.render(scene, camera);
 }
@@ -300,7 +312,8 @@ Animate morph targets (blend shapes) loaded from GLTF.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 let mixer;
 
 const loader = new GLTFLoader();
@@ -326,7 +339,8 @@ function manualMorphControl(mesh, elapsed) {
 }
 
 function animate() {
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
   if (mixer) mixer.update(delta);
   renderer.render(scene, camera);
 }

@@ -9,10 +9,10 @@ description: >
   ShaderChunk, onBeforeCompile, defines, GLSL3.
   Keywords: ShaderMaterial, RawShaderMaterial, GLSL, vertex shader, fragment shader, uniform, varying, ShaderChunk, onBeforeCompile, custom shader, write shader, custom visual effect, GPU programming.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-syntax-shaders
@@ -109,7 +109,7 @@ const material = new THREE.ShaderMaterial({
 | `lights` | `boolean` | `false` | Pass light uniforms to shader |
 | `fog` | `boolean` | `false` | Pass fog uniforms to shader |
 | `clipping` | `boolean` | `false` | Enable clipping planes |
-| `glslVersion` | `string \| null` | `null` | `null` for GLSL1, `THREE.GLSL3` for GLSL 3.0 ES |
+| `glslVersion` | `string \| null` | `null` | ShaderMaterial compiles as GLSL ES 3; GLSL3 removes the legacy gl_FragColor alias |
 | `defaultAttributeValues` | `Object` | -- | Fallback values for missing attributes |
 
 ---
@@ -142,8 +142,7 @@ These are injected automatically. NEVER declare them yourself.
 attribute vec3 position;    // Vertex position
 attribute vec3 normal;      // Vertex normal
 attribute vec2 uv;          // Primary UV coordinates
-attribute vec2 uv2;         // Secondary UV (for aoMap, lightMap)
-attribute vec4 tangent;     // Tangent vector (if computeTangents was called)
+// Declare uv1, uv2, uv3 and tangent yourself when your custom shader needs them.
 attribute vec3 color;       // Vertex color (if geometry has color attribute)
 ```
 
@@ -235,9 +234,9 @@ material.onBeforeCompile = (shader) => {
 // ALWAYS override customProgramCacheKey when using onBeforeCompile
 material.customProgramCacheKey = () => 'my-wavy-material';
 
-// In animation loop
+// In animation loop, after the shared timer.update()
 if (material.userData.shader) {
-  material.userData.shader.uniforms.uTime.value = clock.getElapsedTime();
+  material.userData.shader.uniforms.uTime.value = timer.getElapsed();
 }
 ```
 
@@ -336,6 +335,19 @@ function animate() {
 **NEVER** replace the uniform object itself (e.g., `material.uniforms.uTime = { value: 5 }`). ALWAYS mutate the existing `.value` property. Replacing the object breaks the internal reference.
 
 ---
+
+## r187 TSL Compatibility
+
+Math operands and parameters now coerce to a broader common type. ALWAYS use
+explicit scalar/vector construction or component selection when shader interfaces
+require a fixed shape. `pixelationPass` takes a JavaScript Number for pixelSize,
+not a node. Struct storage is always an array: access element(0) before get('member')
+for a single-element struct buffer. Custom WebGPU lights register with
+CustomLight.registerNode(CustomLightNode), not renderer.library.addLight().
+
+The former transformedNormalView/World and transformedClearcoatNormalView TSL
+exports are absent in r187. Use normalView, normalWorld or clearcoatNormalView
+for those shading accessors. NEVER import internal *Intent helpers.
 
 ## Reference Links
 

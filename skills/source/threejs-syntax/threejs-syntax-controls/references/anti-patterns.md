@@ -186,11 +186,13 @@ function animate() {
 
 **CORRECT:**
 ```javascript
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 
 function animate() {
+  timer.update();
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  const delta = timer.getDelta();
   controls.update(delta); // ALWAYS pass delta for FlyControls
   renderer.render(scene, camera);
 }

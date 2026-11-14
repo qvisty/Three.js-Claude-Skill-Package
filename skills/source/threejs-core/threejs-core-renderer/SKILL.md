@@ -9,10 +9,10 @@ description: >
   Keywords: WebGLRenderer, render loop, setSize, setPixelRatio, toneMapping, outputColorSpace, shadowMap, WebGLRenderTarget, dispose, resize, responsive, canvas size, window resize, fullscreen.
   setAnimationLoop, compileAsync.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-core-renderer
@@ -24,7 +24,7 @@ metadata:
 ```javascript
 import {
   WebGLRenderer, SRGBColorSpace, ACESFilmicToneMapping,
-  PCFSoftShadowMap, PerspectiveCamera, Scene
+  PCFShadowMap, PerspectiveCamera, Scene
 } from 'three';
 
 const renderer = new WebGLRenderer({ antialias: true });
@@ -34,7 +34,7 @@ renderer.outputColorSpace = SRGBColorSpace;
 renderer.toneMapping = ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFSoftShadowMap;
+renderer.shadowMap.type = PCFShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const scene = new Scene();
@@ -92,7 +92,7 @@ renderer.setAnimationLoop((time) => {
 
 **NEVER** forget `camera.updateProjectionMatrix()` after modifying `fov`, `aspect`, `near`, `far`, or `zoom` -- the projection matrix is NOT auto-updated.
 
-**NEVER** use raw `requestAnimationFrame` in Three.js r160+ -- ALWAYS use `renderer.setAnimationLoop()` which handles WebXR sessions automatically.
+**NEVER** use raw `requestAnimationFrame` in Three.js r187 -- ALWAYS use `renderer.setAnimationLoop()` which handles WebXR sessions automatically.
 
 **NEVER** skip `renderer.dispose()` on cleanup -- it leaks WebGL contexts, programs, textures, and framebuffers.
 
@@ -100,7 +100,7 @@ renderer.setAnimationLoop((time) => {
 
 ## Color Management
 
-Three.js r160+ uses a linear workflow with automatic sRGB conversion on output.
+Three.js r187 uses a linear workflow with automatic sRGB conversion on output.
 
 ### Color Space Rules
 
@@ -120,7 +120,7 @@ Three.js r160+ uses a linear workflow with automatic sRGB conversion on output.
 | `ReinhardToneMapping` | General-purpose, preserves color hues well |
 | `CineonToneMapping` | Cinematic film stock look |
 | `ACESFilmicToneMapping` | **Default choice for PBR.** Industry-standard filmic curve |
-| `AgXToneMapping` | Better than ACES for saturated colors. Avoids ACES hue shift on bright blues/reds. (r160+) |
+| `AgXToneMapping` | Better than ACES for saturated colors. Avoids ACES hue shift on bright blues/reds. (r187) |
 | `NeutralToneMapping` | When color accuracy is paramount, minimal artistic transformation |
 
 **ALWAYS** use `ACESFilmicToneMapping` or `AgXToneMapping` for PBR workflows. `AgXToneMapping` is preferred when saturated colors must remain accurate.
@@ -130,17 +130,16 @@ Three.js r160+ uses a linear workflow with automatic sRGB conversion on output.
 ## Shadow Map Configuration
 
 ```javascript
-import { PCFSoftShadowMap } from 'three';
+import { PCFShadowMap } from 'three';
 
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFSoftShadowMap;
+renderer.shadowMap.type = PCFShadowMap;
 ```
 
 | Type | Quality | Performance | Notes |
 |------|---------|-------------|-------|
 | `BasicShadowMap` | Low (hard edges) | Fastest | No filtering |
 | `PCFShadowMap` | Medium | Medium | Default. Percentage-Closer Filtering |
-| `PCFSoftShadowMap` | High (soft edges) | Slower | Bilinear PCF. Most popular choice |
 | `VSMShadowMap` | High (very soft) | Slowest | Can exhibit light bleeding artifacts |
 
 ---
@@ -242,7 +241,7 @@ ALWAYS call `renderTarget.dispose()` when no longer needed.
 // Synchronous -- blocks the thread
 renderer.compile(scene, camera);
 
-// Asynchronous -- non-blocking, prevents frame drops (r160+)
+// Asynchronous -- non-blocking, prevents frame drops (r187)
 await renderer.compileAsync(scene, camera);
 ```
 
@@ -261,10 +260,21 @@ renderer.render(scene, camera);
 
 // Reset to full canvas
 renderer.setScissorTest(false);
-renderer.setViewport(0, 0, canvas.width, canvas.height);
+renderer.setViewport(0, 0, window.innerWidth, window.innerHeight); // CSS-pixel canvas size
 ```
 
 ---
+
+### r187 Coordinate Contract
+
+With no render target bound, viewport/scissor arguments are CSS pixels and
+WebGLRenderer multiplies them by the pixel ratio. With a render target bound,
+they are target pixels and are NOT multiplied. NEVER pre-scale canvas arguments
+or apply the canvas DPR again to target dimensions.
+
+Both renderers require WeakRef and FinalizationRegistry in the JavaScript runtime.
+Use a modern browser/runtime; WebGPU still requires an available adapter or the
+automatic WebGL 2 fallback.
 
 ## Clipping Planes
 
@@ -297,7 +307,7 @@ ALWAYS call `dispose()` when removing a renderer. This releases the WebGL contex
 
 ## WebGPU Renderer
 
-Three.js includes an experimental `WebGPURenderer` with TSL (Three Shading Language) node-based materials. For WebGPU-specific guidance, see the `threejs-impl-webgpu` skill.
+Three.js includes `WebGPURenderer` with TSL (Three Shading Language) node-based materials. For WebGPU-specific guidance, see the `threejs-impl-webgpu` skill.
 
 ---
 

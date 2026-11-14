@@ -8,10 +8,10 @@ description: >
   27+ passes, pmndrs/postprocessing, custom ShaderPass.
   Keywords: post-processing, EffectComposer, bloom, UnrealBloomPass, SSAO, outline, SMAA, FXAA, postprocessing, effects, render pass, glow effect, blur, cinematic, visual effects.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-post-processing
@@ -26,7 +26,7 @@ Three.js offers TWO incompatible post-processing systems. NEVER mix them.
 |--------|---------|----------|----------|
 | Built-in EffectComposer | `three/addons/postprocessing/` | One shader pass per effect | Simple setups, custom ShaderPass |
 | pmndrs/postprocessing | `postprocessing` (npm) | Merges effects into single pass | Performance-critical, R3F apps |
-| WebGPU PostProcessing | `three/addons/tsl/display/` | Node-based TSL graphs | WebGPU renderer only |
+| WebGPU RenderPipeline | `three/addons/tsl/display/` | Node-based TSL graphs | WebGPU renderer only |
 
 ### Standard Pipeline (Built-in EffectComposer)
 
@@ -61,7 +61,7 @@ function animate() {
 
 **NEVER** call `renderer.render( scene, camera )` when using EffectComposer. ALWAYS call `composer.render()` instead -- calling both renders the scene twice.
 
-**NEVER** use WebGL post-processing passes with the WebGPU renderer. WebGPU uses an entirely separate node-based `PostProcessing` class.
+**NEVER** use WebGL post-processing passes with the WebGPU renderer. WebGPU uses an entirely separate node-based `RenderPipeline` class.
 
 **ALWAYS** include `RenderPass` as the first pass. Without it, subsequent passes receive an empty buffer.
 
@@ -295,14 +295,14 @@ window.addEventListener( 'resize', () => {
 
 ---
 
-## WebGPU PostProcessing
+## WebGPU RenderPipeline
 
 The WebGPU renderer uses a SEPARATE node-based system:
 
 ```js
-import { PostProcessing } from 'three/addons/tsl/display/PostProcessing.js';
+import { RenderPipeline } from 'three/webgpu';
 
-const postProcessing = new PostProcessing( renderer );
+const postProcessing = new RenderPipeline( renderer );
 // Uses TSL (Three Shading Language) node graphs for effects
 ```
 

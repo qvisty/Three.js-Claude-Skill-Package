@@ -8,10 +8,10 @@ description: >
   Euler, Color, MathUtils, Box3, Sphere, coordinate system.
   Keywords: Vector3, Matrix4, Quaternion, Euler, Color, MathUtils, lerp, slerp, cross, dot, normalize, degToRad, Y-up, right-handed, rotate object, position math, smooth interpolation.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-core-math

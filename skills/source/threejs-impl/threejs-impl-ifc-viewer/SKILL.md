@@ -8,10 +8,10 @@ description: >
   (AGPL-3.0), IFC loading, spatial tree, property extraction.
   Keywords: IFC, BIM, web-ifc, IFC viewer, @thatopen/components, building model, architecture, IFC loading, spatial tree, BIM viewer, show IFC in browser, load building, web BIM viewer.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0)."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-ifc-viewer

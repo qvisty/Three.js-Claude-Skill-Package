@@ -1,7 +1,7 @@
 # threejs-core-renderer — Method Reference
 
 > Complete API signatures for WebGLRenderer, PerspectiveCamera, OrthographicCamera, and related classes.
-> All signatures verified against Three.js r160+ official documentation.
+> All signatures target Three.js r187 official documentation.
 
 ---
 
@@ -77,7 +77,7 @@ Synchronously compiles all shaders in the scene. Returns the set of compiled mat
 ```typescript
 compileAsync(scene: Scene, camera: Camera): Promise<void>
 ```
-Asynchronously compiles all shaders. Returns a Promise. ALWAYS call after asset loading, before first visible render. (r160+)
+Asynchronously compiles all shaders. Returns a Promise. ALWAYS call after asset loading, before first visible render. (r187)
 
 ### Size and Pixel Ratio Methods
 
@@ -150,13 +150,16 @@ Reads pixel data from a render target into a typed array buffer. The buffer size
 setViewport(x: number, y: number, width: number, height: number): void
 setViewport(v: Vector4): void
 ```
-Sets the viewport region. Coordinates are in pixels from the bottom-left of the canvas.
+Sets the viewport region from the bottom-left. In r187, use CSS pixels for the
+default framebuffer and target pixels when a render target is bound; only the
+default framebuffer path multiplies by renderer pixel ratio.
 
 ```typescript
 setScissor(x: number, y: number, width: number, height: number): void
 setScissor(v: Vector4): void
 ```
-Sets the scissor region. Only pixels within this rectangle are affected by rendering.
+Sets the scissor region. The same r187 CSS-pixel/target-pixel rule applies as
+setViewport. Only pixels within this rectangle are affected by rendering.
 
 ```typescript
 setScissorTest(enable: boolean): void
@@ -353,7 +356,7 @@ clearViewOffset(): void
 new ArrayCamera(cameras?: PerspectiveCamera[])
 ```
 
-Each sub-camera MUST have `camera.viewport` set to a `Vector4(x, y, width, height)` defining its render region.
+Each sub-camera MUST have `camera.viewport` set to a `Vector4(x, y, width, height)` defining its render region. WebGLRenderer ArrayCamera viewports are drawing-buffer pixels, unlike setViewport on the default framebuffer. In XR, the aggregate camera transform/projection comes from the first eye camera in r187; inspect individual sub-cameras for per-eye calculations.
 
 ---
 
@@ -383,8 +386,8 @@ import {
   ReinhardToneMapping,
   CineonToneMapping,
   ACESFilmicToneMapping,
-  AgXToneMapping,        // r160+
-  NeutralToneMapping     // r160+
+  AgXToneMapping,        // r187
+  NeutralToneMapping     // r187
 } from 'three';
 ```
 
@@ -394,7 +397,7 @@ import {
 import {
   BasicShadowMap,
   PCFShadowMap,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   VSMShadowMap
 } from 'three';
 ```

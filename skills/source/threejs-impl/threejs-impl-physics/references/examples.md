@@ -86,10 +86,12 @@ for (let i = 0; i < 20; i++) {
 }
 
 // Animation loop
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 function animate() {
+  timer.update();
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  const delta = timer.getDelta();
 
   world.step(1 / 60, delta, 3);
   for (const { mesh, body } of pairs) {
@@ -341,7 +343,7 @@ function FallingBox({ position }) {
 
 export default function App() {
   return (
-    <Canvas shadows camera={{ position: [0, 10, 20], fov: 75 }}>
+    <Canvas shadows="percentage" camera={{ position: [0, 10, 20], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 10, 5]} castShadow />
       <Physics gravity={[0, -9.81, 0]} debug>

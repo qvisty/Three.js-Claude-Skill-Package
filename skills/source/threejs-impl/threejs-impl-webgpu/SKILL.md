@@ -8,16 +8,15 @@ description: >
   compute shaders, WebGL fallback, migration guide.
   Keywords: WebGPU, WebGPURenderer, TSL, Three Shading Language, node material, compute shader, WGSL, MeshStandardNodeMaterial, next-gen rendering, modern GPU, WebGPU setup.
 license: MIT
-compatibility: "Designed for Claude Code. Requires Three.js r160+. WebGPU: Chrome 113+, Safari 18+."
+compatibility: "Designed for Claude Code. Targets Three.js r187 (three@0.187.0). Native WebGPU requires an available adapter and a secure context; WebGL 2 fallback is automatic."
 metadata:
   author: OpenAEC-Foundation
-  version: "1.0"
+  version: "1.2"
 ---
 
 # threejs-impl-webgpu
 
-> **EXPERIMENTAL** — The WebGPU renderer and TSL are under active development.
-> API surfaces may change between Three.js releases. Pin your Three.js version.
+> Targets Three.js r187 (`three@0.187.0`). Pin this revision: TSL and renderer APIs change between releases.
 
 ## Quick Reference
 
@@ -37,30 +36,24 @@ document.body.appendChild(renderer.domElement);
 **ALWAYS** use `renderer.setAnimationLoop(callback)` instead of `requestAnimationFrame`.
 **NEVER** call `renderer.render()` before `init()` resolves — this throws a runtime error.
 
-### Browser Support
+### Backend Selection and Fallback
 
-| Browser | Version | Status |
-|---------|---------|--------|
-| Chrome | 113+ | Full support |
-| Edge | 113+ | Full support |
-| Safari | 18+ | Supported |
-| Firefox | Experimental | Behind flag (`dom.webgpu.enabled`) |
-
-### Feature Detection and Fallback
+WebGPURenderer automatically falls back to WebGL 2 when WebGPU is unavailable.
+ALWAYS await initialization before checking the selected backend. Browser version
+alone does not establish adapter availability; WebGPU requires a secure context.
 
 ```javascript
-import { WebGPU } from 'three/webgpu';
+import { WebGPURenderer } from 'three/webgpu';
 
-if (WebGPU.isAvailable()) {
-  const renderer = new THREE.WebGPURenderer({ antialias: true });
-  await renderer.init();
-} else {
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-}
+const renderer = new WebGPURenderer({ antialias: true });
+await renderer.init();
+const hasNativeWebGPU = renderer.backend.isWebGPUBackend === true;
+// Use { forceWebGL: true } to exercise the WebGL 2 fallback explicitly.
 ```
 
-**ALWAYS** check `WebGPU.isAvailable()` before creating a WebGPURenderer.
-**ALWAYS** provide a WebGLRenderer fallback for unsupported browsers.
+NEVER replace the renderer with WebGLRenderer just to obtain fallback: its
+material and post-processing APIs differ. Native-only features require a backend
+check, not a browser-name check.
 
 ### Critical Warnings
 
@@ -70,13 +63,13 @@ if (WebGPU.isAvailable()) {
 
 **NEVER** use `requestAnimationFrame` with WebGPURenderer — ALWAYS use `renderer.setAnimationLoop()`.
 
-**NEVER** use `EffectComposer` (three/examples) with WebGPURenderer — use the `PostProcessing` class with TSL nodes instead.
+**NEVER** use `EffectComposer` (three/examples) with WebGPURenderer — use the `RenderPipeline` class with TSL nodes instead.
 
 ---
 
 ## Node Materials
 
-Every classic Three.js material has a node-based equivalent. Classic materials auto-convert when used with WebGPURenderer, but node materials provide full TSL customization.
+Built-in surface materials have node-based equivalents. Classic materials auto-convert when used with WebGPURenderer, but node materials provide full TSL customization.
 
 ### Material Mapping
 
@@ -147,8 +140,8 @@ TSL is a JavaScript-based node graph system that compiles to GLSL (WebGL2) and W
 | Function | Purpose |
 |----------|---------|
 | `uniform(value)` | GPU-side dynamic value |
-| `toVar(node)` | Reusable shader variable |
-| `toConst(node)` | Inline constant |
+| `node.toVar()` | Reusable shader variable |
+| `node.toConst()` | Inline constant |
 | `varying(node)` | Vertex-to-fragment interpolation |
 | `vertexStage(node)` | Force computation in vertex shader |
 | `attribute(name, type)` | Access buffer attributes |
@@ -241,13 +234,21 @@ WebGPU enables general-purpose GPU compute via TSL. Compute shaders are NOT avai
 ### Setup
 
 ```javascript
-import { compute, storage } from 'three/webgpu';
+import { StorageBufferAttribute } from 'three/webgpu';
+import { Fn, storage, instanceIndex, vec3 } from 'three/tsl';
 
-const computeNode = compute(shaderFn, count, workgroupSize);
-await renderer.computeAsync(computeNode);
+const count = 1024;
+const positions = storage(new StorageBufferAttribute(count, 3), 'vec3', count);
+const computeNode = Fn(() => {
+  positions.element(instanceIndex).assign(vec3(0, 1, 0));
+})().compute(count);
+// renderer.init() has already completed.
+if (renderer.backend.isWebGPUBackend) renderer.compute(computeNode);
 ```
 
-**ALWAYS** use `await renderer.computeAsync()` — compute dispatch is asynchronous.
+ALWAYS initialize first, then dispatch with `renderer.compute()`.
+`computeAsync()` is deprecated; initialize once and use `compute()`. General storage-buffer compute requires
+the native WebGPU backend; provide a CPU path or disable the feature on fallback.
 
 ### Storage and Atomics
 
@@ -260,24 +261,34 @@ await renderer.computeAsync(computeNode);
 
 ## WebGPU Post-Processing
 
-**NEVER** use the WebGL `EffectComposer` with WebGPURenderer. Use the `PostProcessing` class instead.
+**NEVER** use the WebGL `EffectComposer` with WebGPURenderer. Use the `RenderPipeline` class instead.
 
 ```javascript
-import { PostProcessing } from 'three/webgpu';
-import { bloom, renderOutput } from 'three/tsl';
+import { RenderPipeline } from 'three/webgpu';
+import { pass } from 'three/tsl';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
-const postProcessing = new PostProcessing(renderer);
-const scenePass = renderOutput(scene, camera);
-postProcessing.outputNode = bloom(scenePass);
+const pipeline = new RenderPipeline(renderer);
+const scenePass = pass(scene, camera);
+const sceneColor = scenePass.getTextureNode('output');
+pipeline.outputNode = sceneColor.add(bloom(sceneColor, 1.5, 0.4, 0.6));
+renderer.setAnimationLoop(() => pipeline.render());
 ```
 
-### Available Post-Processing Nodes
+RenderPipeline performs output tone mapping and color-space conversion by default.
+NEVER also wrap its output in `renderOutput()` unless `outputColorTransform` is
+disabled deliberately. Bloom takes positional strength/radius/threshold arguments.
 
-`bloom()`, `dof()`, `fxaa()`, `smaa()`, `gaussianBlur()`, `ssr()`, `ssgi()`, `ao()`, `chromaticAberration()`, `film()`, `dotScreen()`, `sobel()`, `afterImage()`, `anamorphic()`, `denoise()`, `lut3D()`, `motionBlur()`, `outline()`, `rgbShift()`, `transition()`, `traa()`, `renderOutput()`
+### Effect Imports
+
+ALWAYS import effect helpers from their addons, not from `three/tsl`:
+`BloomNode.js`, `FXAANode.js`, `SMAANode.js`, `GaussianBlurNode.js`,
+`GTAONode.js`, `SSRNode.js`, and `SSGINode.js` live under `three/addons/tsl/display/`.
+Core graph helpers such as `pass`, `uniform`, and `vec3` come from `three/tsl`.
 
 ### Color Operations
 
-`luminance()`, `saturation()`, `vibrance()`, `hue()`, `posterize()`, `grayscale()`, `sepia()`
+`luminance()`, `saturation()`, `vibrance()`, `hue()`, `posterize()`, `grayscale()`
 
 ### Blend Modes
 
@@ -292,13 +303,26 @@ postProcessing.outputNode = bloom(scenePass);
 | 1 | Replace `import * as THREE from 'three'` with `import * as THREE from 'three/webgpu'` |
 | 2 | Replace `new WebGLRenderer()` with `new WebGPURenderer()` and add `await renderer.init()` |
 | 3 | Replace classic materials with NodeMaterial equivalents (or keep classic — they auto-convert) |
-| 4 | Replace `EffectComposer` with `PostProcessing` class and TSL post-processing nodes |
+| 4 | Replace `EffectComposer` with `RenderPipeline` class and TSL post-processing nodes |
 | 5 | Replace raw GLSL `ShaderMaterial` with TSL-based `NodeMaterial` |
 | 6 | Replace `requestAnimationFrame` with `renderer.setAnimationLoop()` |
 
 **ALWAYS** make the entry point `async` when using WebGPURenderer — `renderer.init()` returns a Promise.
 
 ---
+
+## r187 TSL Compatibility
+
+Math operands and parameters now coerce to a broader common type. ALWAYS use
+explicit scalar/vector construction or component selection when shader interfaces
+require a fixed shape. `pixelationPass` takes a JavaScript Number for pixelSize,
+not a node. Struct storage is always an array: access element(0) before get('member')
+for a single-element struct buffer. Custom WebGPU lights register with
+CustomLight.registerNode(CustomLightNode), not renderer.library.addLight().
+
+The former transformedNormalView/World and transformedClearcoatNormalView TSL
+exports are absent in r187. Use normalView, normalWorld or clearcoatNormalView
+for those shading accessors. NEVER import internal *Intent helpers.
 
 ## Reference Links
 
