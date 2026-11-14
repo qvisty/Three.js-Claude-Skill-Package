@@ -5,81 +5,77 @@ Claude Code; de installerer ikke Three.js eller andre afhængigheder i dit progr
 
 ## Installation i dit projekt
 
-Klon skill-repoet uden for dit app-projekt, og kopiér de 24 individuelle skill-mapper
-ind i projektets `.claude/skills/`. Dermed følger deres `references/`-filer med.
-Hvis du allerede har samme skills installeret, tag en backup uden for
-`.claude/skills/` først: kopieringen opdaterer filer med samme navn.
+Du skal have **Node.js 20 eller nyere** og Git. Installationsscriptet bruger kun
+Node.js' indbyggede funktioner: du behøver ikke køre `npm install` i skill-repoet.
+
+Scriptet kopierer alle registrerede skills, deres referencer, eventuelle assets
+og scripts samt licenser til dit projekts `.claude/skills/`. Det kontrollerer
+kildematerialet før kopiering og verificerer filernes SHA-256-hashes bagefter.
 
 ### macOS, Linux eller WSL
 
-Erstat projektstien med din egen:
+Erstat projektstien med dit eksisterende app-projekt:
 
 ```bash
 git clone https://github.com/qvisty/Three.js-Claude-Skill-Package.git "$HOME/threejs-skills-r187"
-cd "/sti/til/dit-projekt"
-mkdir -p .claude/skills
-
-for skill_dir in "$HOME/threejs-skills-r187"/skills/source/*/*; do
-  [ -f "$skill_dir/SKILL.md" ] || continue
-  skill_name="$(basename "$skill_dir")"
-  mkdir -p ".claude/skills/$skill_name"
-  cp -R "$skill_dir/." ".claude/skills/$skill_name/"
-done
-
-find .claude/skills/threejs-* -maxdepth 1 -name SKILL.md | wc -l
+node "$HOME/threejs-skills-r187/scripts/install-claude-skills.mjs" --project "/sti/til/dit-projekt"
 ```
-
-Den sidste kommando skal vise **24**, hvis du kun har denne pakkes Three.js-skills.
-Har du allerede klonet repoet, brug dets eksisterende sti i stedet for at klone igen.
 
 ### Windows PowerShell
 
-Erstat projektstien med din egen:
+Samme script virker i PowerShell. Erstat projektstien med din egen:
 
 ```powershell
 $skillRepo = Join-Path $HOME "threejs-skills-r187"
 git clone https://github.com/qvisty/Three.js-Claude-Skill-Package.git $skillRepo
-$projectDir = "C:\sti\til\dit-projekt"
-$destination = Join-Path $projectDir ".claude\skills"
-New-Item -ItemType Directory -Force -Path $destination | Out-Null
-
-Get-ChildItem (Join-Path $skillRepo "skills\source") -Directory |
-  Get-ChildItem -Directory |
-  Where-Object { Test-Path (Join-Path $_.FullName "SKILL.md") } |
-  ForEach-Object {
-    $target = Join-Path $destination $_.Name
-    New-Item -ItemType Directory -Force -Path $target | Out-Null
-    Copy-Item (Join-Path $_.FullName "*") -Destination $target -Recurse -Force
-  }
-
-@(Get-ChildItem (Join-Path $destination "threejs-*\SKILL.md")).Count
+node (Join-Path $skillRepo "scripts\install-claude-skills.mjs") --project "C:\sti\til\dit-projekt"
 ```
 
-Den sidste kommando skal vise **24**, med samme forbehold som ovenfor.
+Har du allerede klonet repoet, brug dets eksisterende sti i stedet for at klone igen.
+Målprojektet skal findes på forhånd. Scriptet opretter `.claude/skills/` efter behov.
 
-### Kontroller placeringen
+### Kontroller installationen
 
-Strukturen skal være sådan, uden en ekstra kategori-mappe mellem `skills` og skill-navnet:
+Kør samme kommando med `--check`. Den læser filerne uden at skrive til projektet:
+
+```bash
+node /sti/til/skill-repo/scripts/install-claude-skills.mjs --project "/sti/til/dit-projekt" --check
+```
+
+På Windows bruges tilsvarende sti til scriptet og projektet. Du kan også køre
+følgende fra skill-repoets rod:
+
+```bash
+npm run skills:install -- --project "/sti/til/dit-projekt"
+npm run skills:check -- --project "/sti/til/dit-projekt"
+```
+
+En vellykket kontrol bekræfter alle 24 skills og deres filer. Gentager du en
+installation med uændrede filer, sker der ingen omskrivning eller ny backup.
+
+Strukturen bliver:
 
 ```text
 dit-projekt/
   .claude/
+    threejs-skills-install.json
     skills/
       threejs-core-renderer/
         SKILL.md
         references/
-          methods.md
-          examples.md
-          anti-patterns.md
-      threejs-impl-lighting/
-        SKILL.md
-        references/
-      ...
+        LICENSE
+        THIRD_PARTY_NOTICES.md
+      ... øvrige skills
 ```
 
-Kopiér kun skill-mapperne. Repoets egen `CLAUDE.md` beskriver vedligeholdelsen af
-skill-pakken og skal ikke erstatte dit app-projekts `CLAUDE.md`.
-Du behøver ikke installere skill-repoets npm-testværktøjer for at bruge instruktionerne.
+Installationsregistreringen i `.claude/threejs-skills-install.json` gør det muligt
+at skelne en tidligere installation fra lokale ændringer. Bevar den ved opdateringer.
+Andre skills, appens `CLAUDE.md`, projektets afhængigheder og Claude Code-indstillinger
+bliver ikke ændret. Scriptet følger ikke symbolske links i installationsmapperne;
+brug almindelige mapper til denne installation.
+
+Repoets egen `CLAUDE.md` beskriver vedligeholdelsen af skill-pakken og skal ikke
+erstatte dit app-projekts `CLAUDE.md`. Scriptet kopierer den ikke.
 
 ## Aktivering i Claude Code
 
@@ -128,5 +124,33 @@ skill er vejledning, ikke en garanti for at enhver opskrift er fuldt verificeret
 
 ## Senere opdateringer
 
-Kør `git pull --ff-only` i din lokale kopi af skill-repoet og gentag kopieringen.
-Skill-filerne i dit app-projekt opdaterer ikke sig selv fra GitHub.
+Hent først ændringer i din lokale kopi af skill-repoet, og kør samme installer igen:
+
+```bash
+git -C "/sti/til/skill-repo" pull --ff-only
+node /sti/til/skill-repo/scripts/install-claude-skills.mjs --project "/sti/til/dit-projekt"
+```
+
+Scriptet opdaterer uændrede, tidligere installerede skills og fjerner forældede
+filer i disse mapper. Hvis en fremtidig pakke fjerner en skill, kan den tidligere
+registrerede skill også fjernes. Andre skills røres ikke. Tidligere versioner af
+udskiftede mapper gemmes i `.claude/threejs-skill-backups/`, uden for Claudes
+skill-mappe, så backupkopier ikke bliver indlæst som ekstra skills.
+
+Har du ændret en installeret fil eller tilføjet egne filer i en af pakkens mapper,
+stopper hele opdateringen før ændringer i installationen. Du kan enten flytte dine
+rettelser til egne skills eller udtrykkeligt vælge backup og udskiftning:
+
+```bash
+node /sti/til/skill-repo/scripts/install-claude-skills.mjs --project "/sti/til/dit-projekt" --force
+```
+
+`--force` gemmer de eksisterende mapper, inklusive dine egne filer, før de erstattes.
+Scriptet viser backupstien. Det er ikke en sammenfletning af dine rettelser med de
+nye skills. Hvis en udskiftning fejler, forsøger scriptet at gendanne installationen.
+
+Har du installeret manuelt tidligere, kan matchende kopier overtages automatisk.
+Afvigende versioner kræver `--force`, fordi scriptet ikke kender deres historik.
+
+Der udføres ingen automatisk Git-pull, netværksadgang eller opgradering af appens
+Three.js. Installerede skill-filer opdateres, når du selv kører kommandoerne ovenfor.
